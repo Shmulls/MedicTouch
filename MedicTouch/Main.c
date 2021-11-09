@@ -59,10 +59,9 @@ struct doctor* initializeDoc(int *dsize)
 	printf("Please enter the expertise:\n");
 	scanf("%s", temp3);
 
-	dsize = 1;
+	dsize += 1;
 
-
-	data = (struct doctor*)realloc(*dsize, sizeof(struct doctor));
+	data = (struct doctor*)malloc(*dsize*sizeof(struct doctor));
 
 	if (data == NULL)
 	{
@@ -71,6 +70,8 @@ struct doctor* initializeDoc(int *dsize)
 
 	if (dsize > 0)
 	{
+		data = (struct doctor*)realloc(*dsize, sizeof(struct doctor));
+
 		for (int i = 0; i < *dsize; i++)
 		{
 			data[i].user_name = (char*)malloc((strlen(temp)+1) * sizeof(char));
