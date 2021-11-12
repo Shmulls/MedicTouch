@@ -1,141 +1,40 @@
+//#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-struct doctor
+const char* PERSON_FORMAT_OUT = "{\"name\": \"%s\", \"expertise\": \"%s\", \"age\":%d, \"gender\": \"%c\"}\n";
+const char* PERSON_FORMAT_IN = "{\"name\": \"%[^\"]\",\"expertise\": \"%[^\"]\", \"age\":%d, \"gender\": \"%c\"}\n"; //%[^,] - read everthing excepet the ",";
+
+typedef struct Doctor {
+	char name[20];
+	char expertise[30];
+	int age;
+	char gender;
+}Doctor;
+
+int main(int argc, char* argv[])
 {
-	char *user_name, *expertise, *password;
-	int birth_year;
-};
+	Doctor p1 = {
+		.name = "Andrew",
+		.expertise = "family",
+		.age = 22,
+		.gender = 'M'
+	};
 
-struct doctor *initializeDoc(int *dsize);
-void main_menu();
-void login();
-void create_user();
+	Doctor p2;
 
+	FILE* file;
+	fopen_s(&file, "doctor.dat", "w+");
+	if (file == NULL)
+	{
+		return 1;
+	}
 
-int main()
-{
-	main_menu();
+	fprintf_s(file, PERSON_FORMAT_OUT, p1.name, p1.expertise, p1.age, p1.gender);
+	fseek(file, 0, SEEK_SET); 
+	fscanf_s(file, PERSON_FORMAT_IN, p2.name, 20, p2.expertise, 20, &p2.age, &p2.gender);
+
+	printf("\"name\": \"%s\", \"expertise\": \"%s\", \"age\":%d, \"gender\": \"%c\"\n", p1.name, p1.expertise, p1.age, p1.gender);
 	return 0;
-}
-
-void main_menu()
-{
-	int menu_select;
-
-	printf("Hello welcome to MedicTouch clinic appointment management system\n");
-	printf("Please select the operation:\n");
-	printf(" [1] Create user\n [2] Login to the system\n [3] Password recovery\n [4] Exit\n");
-	scanf_s("%d", &menu_select);
-
-	switch (menu_select)
-	{
-		case 1:
-		{
-		login();
-		break;
-		}
-	}
-
-}
-
-void login()
-{
-	printf("Good work!\n");
-}
-
-struct doctor* initializeDoc(int *dsize)
-{
-	char temp[20], temp2[20], temp3[20];
-	struct doctor* data = NULL; // add to doctors archive.
-
-	printf("Please enter the username:\n");
-	scanf("%s", temp);
-
-	printf("Please enter the password:\n");
-	scanf("%s", temp2);
-
-	printf("Please enter the expertise:\n");
-	scanf("%s", temp3);
-
-	dsize += 1;
-
-	data = (struct doctor*)malloc(*dsize*sizeof(struct doctor));
-
-	if (data == NULL)
-	{
-		return NULL;
-	}
-
-	if (dsize > 0)
-	{
-		data = (struct doctor*)realloc(*dsize, sizeof(struct doctor));
-
-		for (int i = 0; i < *dsize; i++)
-		{
-			data[i].user_name = (char*)malloc((strlen(temp)+1) * sizeof(char));
-
-			if (data[i].user_name == NULL)
-			{
-				printf("Doc user name error\n");
-				return NULL;
-			}
-			strcpy(data[i].user_name, temp);
-
-			data[i].password = (char*)malloc((strlen(temp2) + 1) * sizeof(char));
-
-			if (data[i].password == NULL)
-			{
-				printf("Doc user name error\n");
-				return NULL;
-			}
-			strcpy(data[i].user_name, temp2);
-
-			data[i].expertise = (char*)malloc((strlen(temp3) + 1) * sizeof(char));
-
-			if (data[i].expertise == NULL)
-			{
-				printf("Doc user name error\n");
-				return NULL;
-			}
-			strcpy(data[i].user_name, temp3);
-		}
-
-
-
-	}
-	else
-	{
-		data[*dsize].user_name = (char*)malloc((strlen(temp) + 1) * sizeof(char));
-		if (data[*dsize].user_name == NULL)
-		{
-			printf("Doc user name error\n");
-			return NULL;
-		}
-		strcpy(data[*dsize].user_name, temp);
-	}
-
-
-
-}
-
-void create_user()
-{
-	struct doctor *data = NULL;
-	int choose, doctorSize, patientSize;
-
-	printf("Welcome to user registration\n Please select the type of user you want to create\n [1] Doctor\n [2] Patient\n");
-	scanf_s("%d", &choose);
-
-	if (choose == 1)
-	{
-		data = initializeDoc(&doctorSize);
-
-		if (data == NULL)
-		{
-			return 0;
-		}
-	}
-	
 }
