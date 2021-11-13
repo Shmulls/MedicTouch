@@ -5,25 +5,76 @@
 
 typedef struct doctor
 {
+	char user_name[20], password[20], expertise[20], email[50];
+	int day, month, year;
+	char gender;
+
+}doctor;
+
+typedef struct patient
+{
 	char user_name[20];
 	char password[20];
-}doctor;
+}patient;
 
 void create_user()
 {
 	int selection;
-	printf("Choose:\n[1]Patient\n[2]Doctor\n");
+	printf("Choose:\n[1]Doctor\n[2]Patient\n");
 	scanf("%d", &selection);
 
 	switch (selection)
 	{
 		case 1:
 		{
-			FILE* p1 = fopen("Patient.csv", "r+");
-			if (p1 == NULL)
-			exit(1);
+
+			const char* birthdate = "%s, %s,\%d\/\%d\/\%d\, %s, %s, %c\n";
+
+			FILE* p2 = fopen("Doctor.csv", "r+");
+			if (p2 == NULL)
+				exit(1);
 
 			doctor data;
+
+			printf("Enter username:\n");
+			scanf("%s", data.user_name);
+
+			printf("Enter password:\n");
+			printf(">Must contain at least 6 letters or digits (without characters)<\n");
+			scanf("%s", data.password);
+
+			printf("Enter birthdate [day/month/year]:\n");
+			scanf("%d%d%d", &data.day, &data.month, &data.year);
+
+			printf("Enter Expertise: ");
+			printf("(without characters)\n");
+			scanf("%s", data.expertise);
+
+			printf("Enter email address:\n");
+			scanf("%s", data.email);
+
+			printf("Enter gender:\n [M] Man / [W] Woman / [O] Other:\n");
+			scanf(" %c", &data.gender);
+
+
+			//int name = 0, age = 0;
+			//fscanf(fic, "%d;%d", &name, &age);
+			fseek(p2, 0, SEEK_END);
+			fprintf(p2, birthdate, data.user_name, data.password, data.day, data.month, data.year, data.expertise, data.email, data.gender);
+
+			printf(">Welcome to MedicTouch Dr.%s<\n", data.user_name);
+
+			fclose(p2);
+			break;
+		}
+	
+		case 2:
+		{
+			FILE* p1 = fopen("Patient.csv", "r+");
+			if (p1 == NULL)
+				exit(1);
+
+			patient data;
 
 			printf("enter user name: ");
 			scanf("%s", data.user_name);
@@ -38,30 +89,6 @@ void create_user()
 			printf(">Welcome to MedicTouch %s<\n", data.user_name);
 
 			fclose(p1);
-			break;
-		}
-	
-		case 2:
-		{
-			FILE* p2 = fopen("Doctor.csv", "r+");
-			if (p2 == NULL)
-			exit(1);
-
-			doctor data;
-
-			printf("enter user name: ");
-			scanf("%s", data.user_name);
-
-			printf("Enter password: ");
-			scanf("%s", data.password);
-
-			//int name = 0, age = 0;
-			//fscanf(fic, "%d;%d", &name, &age);
-			fseek(p2, 0, SEEK_END);
-			fprintf(p2, "%s,%s\n", data.user_name, data.password);
-			printf(">Welcome to MedicTouch Dr.%s<\n", data.user_name);
-
-			fclose(p2);
 			break;
 		}
 	}
