@@ -1,40 +1,53 @@
-//#define _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-const char* PERSON_FORMAT_OUT = "{\"name\": \"%s\", \"expertise\": \"%s\", \"age\":%d, \"gender\": \"%c\"}\n";
-const char* PERSON_FORMAT_IN = "{\"name\": \"%[^\"]\",\"expertise\": \"%[^\"]\", \"age\":%d, \"gender\": \"%c\"}\n"; //%[^,] - read everthing excepet the ",";
-
-typedef struct Doctor {
-	char name[20];
-	char expertise[30];
-	int age;
-	char gender;
-}Doctor;
-
-int main(int argc, char* argv[])
+typedef struct doctor
 {
-	Doctor p1 = {
-		.name = "Andrew",
-		.expertise = "family",
-		.age = 22,
-		.gender = 'M'
-	};
+	char user_name[20];
+	char password[20];
+}doctor;
 
-	Doctor p2;
+void create_user()
+{
+	FILE* fic = fopen("Doctor.csv", "r+");
+	if (fic == NULL)
+	exit(1);
 
-	FILE* file;
-	fopen_s(&file, "doctor.dat", "w+");
-	if (file == NULL)
+	doctor data;
+
+	printf("enter user name: ");
+	scanf("%s", data.user_name);
+
+	printf("Enter password: ");
+	scanf("%s", data.password);
+
+	//int name = 0, age = 0;
+	//fscanf(fic, "%d;%d", &name, &age);
+	fseek(fic, 0, SEEK_END);
+	fprintf(fic, "%s,%s\n", data.user_name, data.password);
+	printf("username: %s\npassword: %s\n", data.user_name, data.password);
+
+	fclose(fic);
+}
+
+int main()
+{
+	int menu;
+
+	do
 	{
-		return 1;
-	}
+		printf("choose operation: ");
+		scanf("%d", &menu);
 
-	fprintf_s(file, PERSON_FORMAT_OUT, p1.name, p1.expertise, p1.age, p1.gender);
-	fseek(file, 0, SEEK_SET); 
-	fscanf_s(file, PERSON_FORMAT_IN, p2.name, 20, p2.expertise, 20, &p2.age, &p2.gender);
+		switch (menu)
+		{
+			case 1: 
+				create_user();
+		}
 
-	printf("\"name\": \"%s\", \"expertise\": \"%s\", \"age\":%d, \"gender\": \"%c\"\n", p1.name, p1.expertise, p1.age, p1.gender);
+	} while (menu != 0);
+
 	return 0;
 }
