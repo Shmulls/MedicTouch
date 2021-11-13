@@ -17,53 +17,53 @@ void create_user()
 
 	switch (selection)
 	{
-	case 1:
-	{
-		FILE* p1 = fopen("Patient.csv", "r+");
-		if (p1 == NULL)
+		case 1:
+		{
+			FILE* p1 = fopen("Patient.csv", "r+");
+			if (p1 == NULL)
 			exit(1);
 
-		doctor data;
+			doctor data;
 
-		printf("enter user name: ");
-		scanf("%s", data.user_name);
+			printf("enter user name: ");
+			scanf("%s", data.user_name);
 
-		printf("Enter password: ");
-		scanf("%s", data.password);
+			printf("Enter password: ");
+			scanf("%s", data.password);
 
-		//int name = 0, age = 0;
-		//fscanf(fic, "%d;%d", &name, &age);
-		fseek(p1, 0, SEEK_END);
-		fprintf(p1, "%s,%s\n", data.user_name, data.password);
-		printf(">Welcome to MedicTouch %s<\n", data.user_name);
+			//int name = 0, age = 0;
+			//fscanf(fic, "%d;%d", &name, &age);
+			fseek(p1, 0, SEEK_END);
+			fprintf(p1, "%s,%s\n", data.user_name, data.password);
+			printf(">Welcome to MedicTouch %s<\n", data.user_name);
 
-		fclose(p1);
-		break;
-	}
+			fclose(p1);
+			break;
+		}
 	
-	case 2:
-	{
-		FILE* p2 = fopen("Doctor.csv", "r+");
-		if (p2 == NULL)
+		case 2:
+		{
+			FILE* p2 = fopen("Doctor.csv", "r+");
+			if (p2 == NULL)
 			exit(1);
 
-		doctor data;
+			doctor data;
 
-		printf("enter user name: ");
-		scanf("%s", data.user_name);
+			printf("enter user name: ");
+			scanf("%s", data.user_name);
 
-		printf("Enter password: ");
-		scanf("%s", data.password);
+			printf("Enter password: ");
+			scanf("%s", data.password);
 
-		//int name = 0, age = 0;
-		//fscanf(fic, "%d;%d", &name, &age);
-		fseek(p2, 0, SEEK_END);
-		fprintf(p2, "%s,%s\n", data.user_name, data.password);
-		printf(">Welcome to MedicTouch Dr.%s<\n", data.user_name);
+			//int name = 0, age = 0;
+			//fscanf(fic, "%d;%d", &name, &age);
+			fseek(p2, 0, SEEK_END);
+			fprintf(p2, "%s,%s\n", data.user_name, data.password);
+			printf(">Welcome to MedicTouch Dr.%s<\n", data.user_name);
 
-		fclose(p2);
-		break;
-	}
+			fclose(p2);
+			break;
+		}
 	}
 }
 
