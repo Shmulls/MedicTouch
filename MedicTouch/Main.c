@@ -4,6 +4,8 @@
 #include <string.h>
 #include <stdbool.h>
 
+//ddd
+
 typedef struct doctor
 {
 	char user_name[20], password[20], expertise[20], email[50];
