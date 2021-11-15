@@ -286,10 +286,7 @@ void login()
 				printf("Invalid username\n\n");
 			break;
 		}
-
-
 	}
-
 }
 
 int main()
