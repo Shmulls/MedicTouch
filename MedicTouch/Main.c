@@ -11,10 +11,9 @@ typedef struct doctor
 	long phone_number;
 	char gender;
 }doctor;
-
 typedef struct patient
 {
-	char user_name[20], password[20], email[50], city[50];
+	char user_name[20], password[20], email[50];
 	int day, month, year;
 	long phone_number;
 	char gender;
@@ -41,31 +40,31 @@ void create_user()
 		scanf("%s", data.user_name);
 
 		printf("Enter password:\n");
-		printf(">Must contain at least 6 letters or digits (without characters)<\n");
 		scanf("%s", data.password);
 
 		printf("Enter birthdate [day/month/year]:\n");
 		scanf("%d%d%d", &data.day, &data.month, &data.year);
 
-		printf("Enter Expertise: ");
-		printf("(without characters)\n");
+		printf("Enter Expertise:\n");
 		scanf("%s", data.expertise);
 
 		printf("Enter email address:\n");
 		scanf("%s", data.email);
 
+		printf("Enter phone number:\n");
+		scanf(" %ld", &data.phone_number);
+
 		printf("Enter gender:\n [M] Man / [W] Woman / [O] Other:\n");
 		scanf(" %c", &data.gender);
 
 		fseek(p2, 0, SEEK_END);
-		fprintf(p2, "%s, %s, \%d\/\%d\/\%d\, %s, %s, %c\n", data.user_name, data.password, data.day, data.month, data.year, data.expertise, data.email, data.gender);
+		fprintf(p2, "%s, %s, \%d\/\%d\/\%d\, %s, %s, %ld, %c\n", data.user_name, data.password, data.day, data.month, data.year, data.expertise, data.email, data.phone_number, data.gender);
 
 		printf(">Welcome to MedicTouch Dr.%s<\n", data.user_name);
 
 		fclose(p2);
 		break;
 	}
-
 	case 2:
 	{
 		FILE* p1 = fopen("Patient.csv", "r+");
@@ -80,8 +79,20 @@ void create_user()
 		printf("Enter password: ");
 		scanf("%s", data.password);
 
+		printf("Enter birthdate [day/month/year]:\n");
+		scanf("%d%d%d", &data.day, &data.month, &data.year);
+
+		printf("Enter email address:\n");
+		scanf("%s", data.email);
+
+		printf("Enter phone number:\n");
+		scanf("%ld", &data.phone_number);
+
+		printf("Enter gender:\n [M] Man / [W] Woman / [O] Other:\n");
+		scanf(" %c", &data.gender);
+
 		fseek(p1, 0, SEEK_END);
-		fprintf(p1, "%s,%s\n", data.user_name, data.password);
+		fprintf(p1,"% s, % s, \%d\/\% d\/\%d\, % s, % ld, % c", data.user_name, data.password, data.day, data.month, data.year, data.email, data.phone_number, data.gender);
 		printf(">Welcome to MedicTouch %s<\n", data.user_name);
 
 		fclose(p1);
@@ -160,11 +171,11 @@ bool check_password(char password[20])
 }
 bool check_usernamep(char username[20])
 {
-	doctor data;
+	patient data;
 	FILE* p2;
 	int m, n, i, j, found = 0;
 
-	p2 = fopen("Doctor.csv", "r");
+	p2 = fopen("Patient.csv", "r");
 
 	if (p2 == NULL)
 	{
@@ -172,7 +183,7 @@ bool check_usernamep(char username[20])
 		exit(1);
 	}
 
-	while (fgets(data.user_name, sizeof(doctor), p2))
+	while (fgets(data.user_name, sizeof(patient), p2))
 	{
 		char* temp;
 		temp = strtok(data.user_name, ",");
@@ -195,18 +206,18 @@ bool check_usernamep(char username[20])
 }
 bool check_passwordp(char password[20])
 {
-	doctor data;
+	patient data;
 	FILE* p3;
 	int m, n, i, j, found = 0;
 
-	p3 = fopen("Doctor.csv", "r");
+	p3 = fopen("Patient.csv", "r");
 	if (p3 == NULL)
 	{
 		printf("Error opening file\n");
 		exit(1);
 	}
 
-	while (fgets(data.password, sizeof(doctor), p3))
+	while (fgets(data.password, sizeof(patient), p3))
 	{
 		char* temp;
 		temp = strtok(data.password, ",");
@@ -231,6 +242,7 @@ void login()
 {
 	char username[20] = { 0 }, password[20] = { 0 };
 	int menu;
+	printf("---->LOGIN AREA<----\n\n");
 	printf("Enter username: ");
 	getchar();
 	gets(username);
@@ -241,35 +253,38 @@ void login()
 	printf("Choose:\n[1]Doctor\n[2]Patient\n");
 	scanf("%d", &menu);
 
-	
-
 	switch (menu)
 	{
 		case 1:
 		{
-			printf(">DOCTOR LOGIN AREA<\n\n");
 			if (check_username(username))
 			{
 				if (!check_password(password))
 				{
-				printf("Invalid password\n");
+				printf("Invalid password\n\n");
 				}
+				else
+					printf("Welcome to MedicTouch Dr.%s!\n\n", username);
 			}
 		else
-			printf("Invalid username\n");
+			printf("Invalid username\n\n");
+			break;
 		}
+
 		case 2:
 		{
-			printf(">PATIENT LOGIN AREA<\n\n");
 			if (check_usernamep(username))
 			{
 				if (!check_passwordp(password))
 				{
-					printf("Invalid password\n");
+					printf("Invalid password\n\n");
 				}
+				else
+					printf("Welcome to MedicTouch %s!\n\n", username);
 			}
 			else
-				printf("Invalid username\n");
+				printf("Invalid username\n\n");
+			break;
 		}
 
 

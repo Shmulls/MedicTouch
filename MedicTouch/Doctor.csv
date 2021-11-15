@@ -1,3 +1,2 @@
-username,password,datebirth,expertise,email,gender
-shmuel,test,26/01/1995,family,sshmoel1@gmail.com,M
-zacc,test,01/02/1995,family,zacc@gmail.com,M
+username,password,birthdate,expertise,email,phonenumber,gender
+shmuel,pass, 26/1/1995, family, sshmoel1@gmail.com,547448086, M
