@@ -8,13 +8,17 @@ typedef struct doctor
 {
 	char user_name[20], password[20], expertise[20], email[50];
 	int day, month, year;
+	long phone_number;
 	char gender;
 }doctor;
 
 typedef struct patient
 {
-	char user_name[20];
-	char password[20];
+	char user_name[20], password[20], email[50], city[50];
+	int day, month, year;
+	long phone_number;
+	char gender;
+
 }patient;
 
 void create_user()
@@ -85,7 +89,6 @@ void create_user()
 	}
 	}
 }
-
 bool check_username(char username[20])
 {
 	doctor data;
@@ -121,7 +124,6 @@ bool check_username(char username[20])
 	else
 		return false;
 }
-
 bool check_password(char password[20])
 {
 	doctor data;
@@ -156,7 +158,75 @@ bool check_password(char password[20])
 	else
 		return false;
 }
+bool check_usernamep(char username[20])
+{
+	doctor data;
+	FILE* p2;
+	int m, n, i, j, found = 0;
 
+	p2 = fopen("Doctor.csv", "r");
+
+	if (p2 == NULL)
+	{
+		printf("Error opening file\n");
+		exit(1);
+	}
+
+	while (fgets(data.user_name, sizeof(doctor), p2))
+	{
+		char* temp;
+		temp = strtok(data.user_name, ",");
+
+		while (temp != NULL)
+		{
+			if (strcmp(temp, username) == 0)
+			{
+				found = 1;
+				break;
+			}
+			temp = strtok(NULL, ",");
+		}
+	}
+	fclose(p2);
+	if (found == 1)
+		return true;
+	else
+		return false;
+}
+bool check_passwordp(char password[20])
+{
+	doctor data;
+	FILE* p3;
+	int m, n, i, j, found = 0;
+
+	p3 = fopen("Doctor.csv", "r");
+	if (p3 == NULL)
+	{
+		printf("Error opening file\n");
+		exit(1);
+	}
+
+	while (fgets(data.password, sizeof(doctor), p3))
+	{
+		char* temp;
+		temp = strtok(data.password, ",");
+
+		while (temp != NULL)
+		{
+			if (strcmp(temp, password) == 0)
+			{
+				found = 1;
+				break;
+			}
+			temp = strtok(NULL, ",");
+		}
+	}
+	fclose(p3);
+	if (found == 1)
+		return true;
+	else
+		return false;
+}
 void login()
 {
 	char username[20] = { 0 }, password[20] = { 0 };
@@ -177,17 +247,30 @@ void login()
 	{
 		case 1:
 		{
-		if (check_username(username))
-		{
-			if (!check_password(password))
+			printf(">DOCTOR LOGIN AREA<\n\n");
+			if (check_username(username))
 			{
+				if (!check_password(password))
+				{
 				printf("Invalid password\n");
+				}
 			}
-		}
 		else
 			printf("Invalid username\n");
 		}
 		case 2:
+		{
+			printf(">PATIENT LOGIN AREA<\n\n");
+			if (check_usernamep(username))
+			{
+				if (!check_passwordp(password))
+				{
+					printf("Invalid password\n");
+				}
+			}
+			else
+				printf("Invalid username\n");
+		}
 
 
 	}
