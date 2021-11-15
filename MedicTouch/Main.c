@@ -9,7 +9,6 @@ typedef struct doctor
 	char user_name[20], password[20], expertise[20], email[50];
 	int day, month, year;
 	char gender;
-
 }doctor;
 
 typedef struct patient
@@ -28,9 +27,6 @@ void create_user()
 	{
 	case 1:
 	{
-
-		/*const char* birthdate = "%s, %s,\%d\/\%d\/\%d\, %s, %s, %c\n";*/
-
 		FILE* p2 = fopen("Doctor.csv", "r+");
 		if (p2 == NULL)
 			exit(1);
@@ -80,8 +76,6 @@ void create_user()
 		printf("Enter password: ");
 		scanf("%s", data.password);
 
-		//int name = 0, age = 0;
-		//fscanf(fic, "%d;%d", &name, &age);
 		fseek(p1, 0, SEEK_END);
 		fprintf(p1, "%s,%s\n", data.user_name, data.password);
 		printf(">Welcome to MedicTouch %s<\n", data.user_name);
@@ -166,6 +160,7 @@ bool check_password(char password[20])
 void login()
 {
 	char username[20] = { 0 }, password[20] = { 0 };
+	int menu;
 	printf("Enter username: ");
 	getchar();
 	gets(username);
@@ -173,16 +168,29 @@ void login()
 	printf("Enter password: ");
 	gets(password);
 
-	if (check_username(username))
-	{
-		if (!check_password(password))
-		{
-			printf("Invalid password\n");
-		}
-	}
-	else
-		printf("Invalid username\n");
+	printf("Choose:\n[1]Doctor\n[2]Patient\n");
+	scanf("%d", &menu);
 
+	
+
+	switch (menu)
+	{
+		case 1:
+		{
+		if (check_username(username))
+		{
+			if (!check_password(password))
+			{
+				printf("Invalid password\n");
+			}
+		}
+		else
+			printf("Invalid username\n");
+		}
+		case 2:
+
+
+	}
 
 }
 
