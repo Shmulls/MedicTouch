@@ -27,6 +27,12 @@ bool check_usernamep(char username[20]);
 bool check_passwordp(char password[20]);
 void create_user();
 void login();
+void doctor_menu();		// Hadar
+void patient_menu();	// Ido
+void nurse_appointment();		// Rita
+void lab_appointment();		// Rita
+void doctor_appointment();	// Lir
+
 int main()
 {
 	int menu;
@@ -309,7 +315,10 @@ void login()
 				printf("Invalid password\n\n");
 			}
 			else
+			{
 				printf("Welcome to MedicTouch Dr.%s!\n\n", username);
+				void doctor_menu();
+			}
 		}
 		else
 			printf("Invalid username\n\n");
@@ -325,11 +334,119 @@ void login()
 				printf("Invalid password\n\n");
 			}
 			else
+			{
 				printf("Welcome to MedicTouch %s!\n\n", username);
+				void patient_menu();
+			}
 		}
 		else
 			printf("Invalid username\n\n");
 		break;
 	}
 	}
+}
+void doctor_menu()
+{
+	//Hadar
+
+	int select;
+	printf("[1]Edit doctor profile\n[2]Doctor calendar\n[3]Return to main menu\n");
+
+	scanf("%d", &select);
+
+	do 
+	{
+		switch (select)
+		{
+		case 1:
+		{
+			break;
+		}
+
+		case 2:
+		{
+			break;
+		}
+
+		case 3:
+		{
+			return;
+			break;
+		}
+
+		}
+	} while (select != 3);
+}
+void patient_menu()
+{
+	//Ido
+	//Call lir requirements functions (4) 
+	//Call Rita requirements functions (5,6) 
+	int select;
+	printf("[1]Schedule an appointment to doctor\n[2]Schedule an appointment to nurse\n[3]Schedule an appointment to lab tests\n[4]Cancel an existing appointment\n[5]Choose the appointment\n[6]Choose another date for new appointment\n[7]View a list of future appointments\n[8]Return to main menu\n");
+
+	scanf("%d", &select);
+
+	do
+	{
+		switch (select)
+		{
+			case 1:
+			{	
+				doctor_appointment();	
+				break;
+			}
+
+			case 2:
+			{
+				nurse_appointment();
+				break;
+			}
+
+			case 3:
+			{
+				lab_appointment();
+				break;
+			}
+
+			case 4:
+			{
+				break;
+			}
+
+			case 5:
+			{
+				break;
+			}
+
+			case 6:
+			{
+				break;
+			}
+
+			case 7:
+			{
+				break;
+			}
+
+			case 8:
+			{
+				return;
+				break;
+			}
+
+		}
+	} while (select != 8);
+}
+void nurse_appointment() 
+{
+
+}
+void lab_appointment()
+{
+
+}
+void doctor_appointment()
+{
+
 }
