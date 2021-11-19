@@ -27,7 +27,7 @@ bool check_usernamep(char username[20]);
 bool check_passwordp(char password[20]);
 void create_user();
 void login();
-void doctor_menu();			// Hadar
+void doctor_menu();		// Hadar
 void patient_menu();		// Ido
 void nurse_appointment();	// Rita
 void lab_appointment();		// Rita
