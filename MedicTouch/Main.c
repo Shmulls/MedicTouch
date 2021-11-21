@@ -448,5 +448,17 @@ void lab_appointment()
 }
 void doctor_appointment()
 {
+	int type;
+	printf("please choose your preferred type of appointment:\n[1]Face to face appointment\n[2]Phone appointment");
+	scanf("%d", &type);
 
+	char city[20];
+	if (type == 1) {
+		printf("please enter the name of the city where the clinic you want to go is located:\n");
+		gets(city);
+	}
+
+	char typedoc[20];
+	printf("please enter the type of doctor you would like to make an appointment with:\n");
+	gets(typedoc);
 }
