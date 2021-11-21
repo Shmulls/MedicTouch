@@ -337,7 +337,7 @@ void login()
 			else
 			{
 				printf("Welcome to MedicTouch %s!\n\n", username);
-				void patient_menu();
+				patient_menu();
 			}
 		}
 		else
@@ -384,57 +384,54 @@ void patient_menu()
 	//Call lir requirements functions (4) 
 	//Call Rita requirements functions (5,6) 
 	int select;
-	printf("[1]Schedule an appointment to doctor\n[2]Schedule an appointment to nurse\n[3]Schedule an appointment to lab tests\n[4]Cancel an existing appointment\n[5]Choose the appointment\n[6]Choose another date for new appointment\n[7]View a list of future appointments\n[8]Return to main menu\n");
-
-	scanf("%d", &select);
 
 	do
 	{
+		printf("[1]Schedule an appointment to doctor\n[2]Schedule an appointment to nurse\n[3]Schedule an appointment to lab tests\n[4]Cancel an existing appointment\n[5]Choose the appointment\n[6]Choose another date for new appointment\n[7]View a list of future appointments\n[8]Return to main menu\n");
+
+		scanf("%d", &select);
+
 		switch (select)
 		{
 			case 1:
-			{	
 				doctor_appointment();	
 				break;
-			}
+			
 
 			case 2:
-			{
 				nurse_appointment();
 				break;
-			}
+			
 
 			case 3:
-			{
 				lab_appointment();
 				break;
-			}
+			
 
 			case 4:
-			{
+			
 				break;
-			}
+			
 
 			case 5:
-			{
+			
 				break;
-			}
+			
 
 			case 6:
-			{
+			
 				break;
-			}
+			
 
 			case 7:
-			{
+			
 				break;
-			}
+			
 
 			case 8:
-			{
-				return;
+			
 				break;
-			}
+			
 
 		}
 	} while (select != 8);
@@ -449,39 +446,74 @@ void lab_appointment()
 }
 void doctor_appointment()
 {
-	int type;
-	printf("please choose your preferred type of appointment:\n[1]Face to face appointment\n[2]Phone appointment");
-	scanf("%d", &type);
+	
+	char city[20], reason[200], doctortype[40], time[20], reminder;
+	char *typeAP = malloc(100);
+	int day, month, year, type;
+	FILE* p4 = fopen("DoctorAppointment.csv", "r+");
+	if (p4 == NULL)
+		exit(1);
 
-	char city[20];
-	if (type == 1) {
-		printf("please enter the name of the city where the clinic you want to go is located:\n");
-		scanf("%s", &city);
+	printf("Please choose your preferred type of appointment:\n[1]Face to face appointment\n[2]Phone appointment\n");
+	scanf("%d", &type);
+	fgetc(stdin);
+
+	if (type == 1)
+	{
+		strcpy(typeAP, "Face to face");
+		printf("Please enter the name of the city where the clinic you want to go is located:\n");
+		fgets(city, 20, stdin);
+		city[strlen(city) - 1] = 0;
+	}
+	else
+	{
+		strcpy(typeAP, "Phone");
 	}
 
-	char typedoc[20];
-	printf("please enter the type of doctor you would like to make an appointment with:\n");
-	scanf("%s", &typedoc);
+	printf("Please enter the type of doctor you would like to make an appointment with:\n");
+	fgets(doctortype, 40, stdin);
+	doctortype[strlen(doctortype) - 1] = 0;
 
-	int day, month, year;
-	printf("please enter the t\date you want to make the appointment: [day/month/year]:\n");
+	printf("Please enter the date you want to make the appointment: [day/month/year]:\n");
 	scanf("%d%d%d", &day, &month, &year);
+	fgetc(stdin);
 
 	/*if (IsOccupied) {
 	printf("Sorry, this day is occupied, please try another one:\n")
 	scanf("%d%d%d", &day, &month, &year);
 	*/
 
-	char time[20];
-	printf("please enter the time you want to make the appointment:\n notice: the appointment are scheduled every half hour, so choose Round or half hour\n");
-	scanf("%s", &time);
+	printf("Please enter the time you want to make the appointment:\n->Notice: the appointment are scheduled every half hour, so choose Round or half hour\n");
+	fgets(time, 20, stdin);
+	time[strlen(time) - 1] = 0;
 
 	/*if (IsOccupied) {
 	printf("Sorry, this time is occupied, please try another one:\n")
 	scanf("%s", &time);
 	*/
+	printf("Do you want sumbit a reason for the appoinetment?\n[1]Yes\n[2]No\n");
+	scanf("%d", &type);
+	fgetc(stdin);
+	
+	if (type == 1)
+	{
+		printf("Please the reason for the appoinetment\n->Notice: you can sumbit only 200 charcters\n");
+		fgets(reason, 200, stdin);
+		reason[strlen(reason) - 1] = 0;
+	}
+	else
+	{
+		strcpy(reason, "N/A");
+	}
 
-	char ans;
-	printf("Would you like to receive a phone reminder day before the appointment?\n please choose Y for yes, N for no\n");
-	scanf("%c", &ans);
+	printf("Would you like to receive a phone reminder day before the appointment?\nPlease choose:\n[Y]For yes [N]For no\n");
+	scanf("%c", &reminder);
+
+	fseek(p4, 0, SEEK_END);
+	fprintf(p4, "%s, %s, %s, \%d\/\%d\/\%d\, %s, %s, %c\n", typeAP, city, doctortype, day, month, year, time, reason, reminder);
+
+	printf(">The appoinetment is set!<\n\n");
+
+	fclose(p4);
+	free(typeAP);
 }
