@@ -455,10 +455,32 @@ void doctor_appointment()
 	char city[20];
 	if (type == 1) {
 		printf("please enter the name of the city where the clinic you want to go is located:\n");
-		gets(city);
+		scanf("%s", &city);
 	}
 
 	char typedoc[20];
 	printf("please enter the type of doctor you would like to make an appointment with:\n");
-	gets(typedoc);
+	scanf("%s", &typedoc);
+
+	int day, month, year;
+	printf("please enter the t\date you want to make the appointment: [day/month/year]:\n");
+	scanf("%d%d%d", &day, &month, &year);
+
+	/*if (IsOccupied) {
+	printf("Sorry, this day is occupied, please try another one:\n")
+	scanf("%d%d%d", &day, &month, &year);
+	*/
+
+	char time[20];
+	printf("please enter the time you want to make the appointment:\n notice: the appointment are scheduled every half hour, so choose Round or half hour\n");
+	scanf("%s", &time);
+
+	/*if (IsOccupied) {
+	printf("Sorry, this time is occupied, please try another one:\n")
+	scanf("%s", &time);
+	*/
+
+	char ans;
+	printf("Would you like to receive a phone reminder day before the appointment?\n please choose Y for yes, N for no\n");
+	scanf("%c", &ans);
 }
