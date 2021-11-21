@@ -347,7 +347,7 @@ void login()
 }
 void doctor_menu()
 {
-	//Hadar
+	//Hadar_test1
 
 	int select;
 	printf("[1]Edit doctor profile\n[2]Doctor calendar\n[3]Return to main menu\n");
