@@ -447,7 +447,7 @@ void lab_appointment()
 void doctor_appointment()
 {
 	
-	char city[20], reason[200], doctortype[40], time[20], reminder;
+	char city[30], reason[200], doctortype[40], time[20], reminder;
 	char *typeAP = malloc(100);
 	int day, month, year, type;
 	FILE* p4 = fopen("DoctorAppointment.csv", "r+");
@@ -462,7 +462,7 @@ void doctor_appointment()
 	{
 		strcpy(typeAP, "Face to face");
 		printf("Please enter the name of the city where the clinic you want to go is located:\n");
-		fgets(city, 20, stdin);
+		fgets(city, 30, stdin);
 		city[strlen(city) - 1] = 0;
 	}
 	else
