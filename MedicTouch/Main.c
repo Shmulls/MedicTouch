@@ -24,8 +24,8 @@ typedef struct patient
 
 bool check_username(char username[20]);
 bool check_password(char password[20]);
-bool check_usernamep(char username[20]);
-bool check_passwordp(char password[20]);
+bool check_usernamep(char username[20], int *counter);
+bool check_passwordp(char password[20], int counter);
 void create_user();
 void login();
 void doctor_menu();		// Hadar
@@ -127,11 +127,11 @@ bool check_password(char password[20])
 	else
 		return false;
 }
-bool check_usernamep(char username[20])
+bool check_usernamep(char username[20], int *counter)
 {
 	patient data;
 	FILE* p2;
-	int m, n, i, j, found = 0;
+	int m, n, i, j, found = 0, rawcounter = 0;
 
 	p2 = fopen("Patient.csv", "r");
 
@@ -141,6 +141,8 @@ bool check_usernamep(char username[20])
 		exit(1);
 	}
 
+	fseek(p2, 54, SEEK_SET);
+
 	while (fgets(data.user_name, sizeof(patient), p2))
 	{
 		char* temp;
@@ -148,6 +150,7 @@ bool check_usernamep(char username[20])
 
 		while (temp != NULL)
 		{
+			rawcounter++;
 			if (strcmp(temp, username) == 0)
 			{
 				found = 1;
@@ -156,16 +159,18 @@ bool check_usernamep(char username[20])
 			temp = strtok(NULL, ",");
 		}
 	}
+	*counter = rawcounter;
 	fclose(p2);
 	if (found == 1)
 		return true;
 	else
 		return false;
 }
-bool check_passwordp(char password[20])
+bool check_passwordp(char password[20], int counter)
 {
 	patient data;
 	FILE* p3;
+	int rawcounter = 0;
 	int m, n, i, j, found = 0;
 
 	p3 = fopen("Patient.csv", "r");
@@ -175,6 +180,8 @@ bool check_passwordp(char password[20])
 		exit(1);
 	}
 
+	fseek(p3, 54, SEEK_SET);
+
 	while (fgets(data.password, sizeof(patient), p3))
 	{
 		char* temp;
@@ -182,12 +189,20 @@ bool check_passwordp(char password[20])
 
 		while (temp != NULL)
 		{
-			if (strcmp(temp, password) == 0)
+			if (rawcounter > counter + 5)
 			{
-				found = 1;
 				break;
 			}
-			temp = strtok(NULL, ",");
+			else
+			{
+				rawcounter++;
+				if (strcmp(temp, password) == 0)
+				{
+					found = 1;
+					break;
+				}
+				temp = strtok(NULL, ",");
+			}
 		}
 	}
 	fclose(p3);
@@ -253,6 +268,7 @@ void create_user()
 		FILE* p1 = fopen("Patient.csv", "r+");
 		if (p1 == NULL)
 			exit(1);
+		int counter = 0;
 
 		patient data;
 
@@ -261,9 +277,9 @@ void create_user()
 			printf("Enter username:\n");
 			scanf("%s", data.user_name);
 			strcpy(temp_username, data.user_name);
-			if (check_usernamep(temp_username))
+			if (check_usernamep(temp_username, &counter))
 				printf("This username already exists, try again.\n\n");
-		} while (check_usernamep(temp_username));
+		} while (check_usernamep(temp_username, &counter));
 		
 
 		printf("Enter password: ");
@@ -293,7 +309,7 @@ void create_user()
 void login()
 {
 	char username[20] = { 0 }, password[20] = { 0 };
-	int menu;
+	int menu, counter = 0;
 	printf("---->LOGIN AREA<----\n\n");
 	printf("Enter username: ");
 	getchar();
@@ -328,9 +344,9 @@ void login()
 
 	case 2:
 	{
-		if (check_usernamep(username))
+		if (check_usernamep(username, &counter))
 		{
-			if (!check_passwordp(password))
+			if (!check_passwordp(password, counter))
 			{
 				printf("Invalid password\n\n");
 			}
