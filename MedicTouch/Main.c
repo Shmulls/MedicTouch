@@ -22,13 +22,13 @@ typedef struct patient
 
 }patient;
 
-bool check_username(char username[20]);
-bool check_password(char password[20]);
+bool check_username(char username[20], int *counter);
+bool check_password(char password[20], int counter);
 bool check_usernamep(char username[20], int *counter);
 bool check_passwordp(char password[20], int counter);
 void create_user();
 void login();
-void doctor_menu();		// Hadar
+void doctor_menu();			// Hadar
 void patient_menu();		// Ido
 void nurse_appointment();	// Rita
 void lab_appointment();		// Rita
@@ -43,7 +43,9 @@ int main()
 	do
 	{
 		printf("Choose operation:\n[1]Create user\n[2]Login\n[3]Password recovery\n[0]Exit\n");
-		scanf("%d", &menu);
+		if (scanf("%d", &menu) != 1) {
+			printf("\n");
+		}
 
 		switch (menu)
 		{
@@ -60,11 +62,11 @@ int main()
 	return 0;
 }
 
-bool check_username(char username[20])
+bool check_username(char username[20], int *counter)
 {
 	doctor data;
 	FILE* p2;
-	int m, n, i, j, found = 0;
+	int found = 0;
 
 	p2 = fopen("Doctor.csv", "r");
 
@@ -74,7 +76,7 @@ bool check_username(char username[20])
 		exit(1);
 	}
 
-	while (fgets(data.user_name, sizeof(doctor), p2))
+	while (fgets(data.user_name, 20, p2))
 	{
 		char* temp;
 		temp = strtok(data.user_name, ",");
@@ -95,11 +97,11 @@ bool check_username(char username[20])
 	else
 		return false;
 }
-bool check_password(char password[20])
+bool check_password(char password[20], int counter)
 {
 	doctor data;
 	FILE* p3;
-	int m, n, i, j, found = 0;
+	int found = 0;
 
 	p3 = fopen("Doctor.csv", "r");
 	if (p3 == NULL)
@@ -108,7 +110,7 @@ bool check_password(char password[20])
 		exit(1);
 	}
 
-	while (fgets(data.password, sizeof(doctor), p3))
+	while (fgets(data.password, 20, p3))
 	{
 		char* temp;
 		temp = strtok(data.password, ",");
@@ -133,7 +135,7 @@ bool check_usernamep(char username[20], int *counter)
 {
 	patient data;
 	FILE* p2;
-	int m, n, i, j, found = 0, rawcounter = 0;
+	int found = 0, rawcounter = 0;
 
 	p2 = fopen("Patient.csv", "r");
 
@@ -145,7 +147,7 @@ bool check_usernamep(char username[20], int *counter)
 
 	fseek(p2, 54, SEEK_SET);
 
-	while (fgets(data.user_name, sizeof(patient), p2))
+	while (fgets(data.user_name, 20, p2))
 	{
 		char* temp;
 		temp = strtok(data.user_name, ",");
@@ -173,7 +175,7 @@ bool check_passwordp(char password[20], int counter)
 	patient data;
 	FILE* p3;
 	int rawcounter = 0;
-	int m, n, i, j, found = 0;
+	int found = 0;
 
 	p3 = fopen("Patient.csv", "r");
 	if (p3 == NULL)
@@ -184,14 +186,14 @@ bool check_passwordp(char password[20], int counter)
 
 	fseek(p3, 54, SEEK_SET);
 
-	while (fgets(data.password, sizeof(patient), p3))
+	while (fgets(data.password, 20, p3))
 	{
 		char* temp;
 		temp = strtok(data.password, ",");
 
 		while (temp != NULL)
 		{
-			if (rawcounter > counter + 5)
+			if (rawcounter > (counter + 5)) //this method used for search by line data of the user. if the search method finish to read user data raw the program will break;
 			{
 				break;
 			}
@@ -200,8 +202,13 @@ bool check_passwordp(char password[20], int counter)
 				rawcounter++;
 				if (strcmp(temp, password) == 0)
 				{
-					found = 1;
-					break;
+					if (rawcounter < counter) //this method will ensure that the password check will be will search only in the correct raw.
+						return false;
+					else
+					{
+						found = 1;
+						break;
+					}
 				}
 				temp = strtok(NULL, ",");
 			}
@@ -218,47 +225,62 @@ void create_user()
 	int selection;
 	char temp_username[20];
 	printf("Choose:\n[1]Doctor\n[2]Patient\n");
-	scanf("%d", &selection);
+	if (scanf("%d", &selection) != 1) {
+		printf("\n");
+	}
+	fgetc(stdin);
 
 	switch (selection)
 	{
 	case 1:
 	{
+		doctor data;
+		int counter = 0;
 		FILE* p2 = fopen("Doctor.csv", "r+");
 		if (p2 == NULL)
 			exit(1);
-
-		doctor data;
-
 		do
 		{
 			printf("Enter username:\n");
-			scanf("%s", data.user_name);
+			fgets(data.user_name, 20, stdin);
+			data.user_name[strlen(data.user_name) - 1] = 0;
 			strcpy(temp_username, data.user_name);
-			if (check_username(temp_username))
+			if (check_username(temp_username, &counter))
 				printf("This username already exists, try again.\n\n");
-		} while (check_username(temp_username));
+		} while (check_username(temp_username, &counter));
 
 		printf("Enter password:\n");
-		scanf("%s", data.password);
+		fgets(data.password, 20, stdin);
+		data.password[strlen(data.password) - 1] = 0;
+
 
 		printf("Enter birthdate [day/month/year]:\n");
-		scanf("%d%d%d", &data.day, &data.month, &data.year);
+		if (scanf("%d%d%d", &data.day, &data.month, &data.year) != 1) {
+			printf("\n");
+		}
+		fgetc(stdin);
 
 		printf("Enter Expertise:\n");
-		scanf("%s", data.expertise);
+		fgets(data.expertise, 20, stdin);
+		data.expertise[strlen(data.expertise) - 1] = 0;
 
 		printf("Enter email address:\n");
-		scanf("%s", data.email);
+		fgets(data.email, 50, stdin);
+		data.email[strlen(data.email) - 1] = 0;
 
 		printf("Enter phone number:\n");
-		scanf(" %ld", &data.phone_number);
+		if (scanf(" %ld", &data.phone_number) != 1) {
+			printf("\n");
+		}
+		fgetc(stdin);
 
-		printf("Enter gender:\n [M] Man / [W] Woman / [O] Other:\n");
-		scanf(" %c", &data.gender);
+		printf("Enter gender:\n[M] Man / [W] Woman / [O] Other:\n");
+		if (scanf(" %c", &data.gender) != 1) {
+			printf("\n");
+		}
 
 		fseek(p2, 0, SEEK_END);
-		fprintf(p2, "%s, %s, \%d\/\%d\/\%d\, %s, %s, %ld, %c\n", data.user_name, data.password, data.day, data.month, data.year, data.expertise, data.email, data.phone_number, data.gender);
+		fprintf(p2, "%s,%s,\%d\/\%d\/\%d\,%s,%s,%ld,%c\n", data.user_name, data.password, data.day, data.month, data.year, data.expertise, data.email, data.phone_number, data.gender);
 
 		printf(">Welcome to MedicTouch Dr.%s<\n", data.user_name);
 
@@ -267,40 +289,49 @@ void create_user()
 	}
 	case 2:
 	{
+		patient data;
+		int counter = 0;
 		FILE* p1 = fopen("Patient.csv", "r+");
 		if (p1 == NULL)
 			exit(1);
-		int counter = 0;
-
-		patient data;
 
 		do
 		{
 			printf("Enter username:\n");
-			scanf("%s", data.user_name);
+			fgets(data.user_name, 20, stdin);
+			data.user_name[strlen(data.user_name) - 1] = 0;
 			strcpy(temp_username, data.user_name);
 			if (check_usernamep(temp_username, &counter))
 				printf("This username already exists, try again.\n\n");
 		} while (check_usernamep(temp_username, &counter));
 		
-
-		printf("Enter password: ");
-		scanf("%s", data.password);
+		printf("Enter password:\n");
+		fgets(data.password, 20, stdin);
+		data.password[strlen(data.password) - 1] = 0;
 
 		printf("Enter birthdate [day/month/year]:\n");
-		scanf("%d%d%d", &data.day, &data.month, &data.year);
+		if (scanf(" %d%d%d", &data.day, &data.month, &data.year) != 1) {
+			printf("\n");
+		}
+		fgetc(stdin);
 
 		printf("Enter email address:\n");
-		scanf("%s", data.email);
-
+		fgets(data.email, 50, stdin);
+		data.email[strlen(data.email) - 1] = 0;
+		
 		printf("Enter phone number:\n");
-		scanf("%ld", &data.phone_number);
+		if (scanf("%ld", &data.phone_number) != 1) {
+			printf("\n");
+		}
+		fgetc(stdin);
 
-		printf("Enter gender:\n [M] Man / [W] Woman / [O] Other:\n");
-		scanf(" %c", &data.gender);
+		printf("Enter gender:\n[M] Man / [W] Woman / [O] Other:\n");
+		if (scanf(" %c", &data.gender) != 1) {
+			printf("\n");
+		}
 
 		fseek(p1, 0, SEEK_END);
-		fprintf(p1, "% s, % s, \%d\/\% d\/\%d\, % s, % ld, % c", data.user_name, data.password, data.day, data.month, data.year, data.email, data.phone_number, data.gender);
+		fprintf(p1, "%s,%s,\%d\/\%d\/\%d\,%s,%ld,%c\n", data.user_name, data.password, data.day, data.month, data.year, data.email, data.phone_number, data.gender);
 		printf(">Welcome to MedicTouch %s<\n", data.user_name);
 
 		fclose(p1);
@@ -314,22 +345,25 @@ void login()
 	int menu, counter = 0;
 	printf("---->LOGIN AREA<----\n\n");
 	printf("Enter username: ");
-	getchar();
-	gets(username);
+	fgets(username, 20, stdin);
+	username[strlen(username) - 1] = 0;
 
 	printf("Enter password: ");
-	gets(password);
+	fgets(password, 20, stdin);
+	password[strlen(password) - 1] = 0;
 
 	printf("Choose:\n[1]Doctor\n[2]Patient\n");
-	scanf("%d", &menu);
+	if (scanf("%d", &menu) != 1) {
+		printf("\n");
+	}
 
 	switch (menu)
 	{
 	case 1:
 	{
-		if (check_username(username))
+		if (check_username(username, &counter))
 		{
-			if (!check_password(password))
+			if (!check_password(password, counter))
 			{
 				printf("Invalid password\n\n");
 			}
@@ -373,8 +407,9 @@ void doctor_menu()
 	{
 		
 		printf("[1]Edit doctor profile\n[2]Doctor calendar\n[3]Return to main menu\n");
-
-		scanf("%d", &select);
+		if (scanf("%d", &select) != 1) {
+			printf("\n");
+		}
 		switch (select)
 		{
 		case 1:
@@ -382,7 +417,9 @@ void doctor_menu()
 			int select;
 			printf("Choose section to update in your profile\n");
 			printf("[1]City\n[2]Birthdate\n[3]Email\n[4]Expertise\n[5]Phone number\n");
-			scanf("%d", &select);
+			if (scanf("%d", &select) != 1) {
+				printf("\n");
+			}
 
 			editprofile(select);
 		}
@@ -412,8 +449,9 @@ void patient_menu()
 	do
 	{
 		printf("[1]Schedule an appointment to doctor\n[2]Schedule an appointment to nurse\n[3]Schedule an appointment to lab tests\n[4]Cancel an existing appointment\n[5]Choose the appointment\n[6]Choose another date for new appointment\n[7]View a list of future appointments\n[8]Return to main menu\n");
-
-		scanf("%d", &select);
+		if (scanf("%d", &select) != 1) {
+			printf("\n");
+		}
 
 		switch (select)
 		{
@@ -479,7 +517,9 @@ void doctor_appointment()
 		exit(1);
 
 	printf("Please choose your preferred type of appointment:\n[1]Face to face appointment\n[2]Phone appointment\n");
-	scanf("%d", &type);
+	if (scanf("%d", &type) != 1) {
+		printf("\n");
+	}
 	fgetc(stdin);
 
 	if (type == 1)
@@ -499,7 +539,9 @@ void doctor_appointment()
 	doctortype[strlen(doctortype) - 1] = 0;
 
 	printf("Please enter the date you want to make the appointment: [day/month/year]:\n");
-	scanf("%d%d%d", &day, &month, &year);
+	if (scanf("%d%d%d", &day, &month, &year) != 1) {
+		printf("\n");
+	}
 	fgetc(stdin);
 
 	/*if (IsOccupied) {
@@ -516,7 +558,9 @@ void doctor_appointment()
 	scanf("%s", &time);
 	*/
 	printf("Do you want sumbit a reason for the appoinetment?\n[1]Yes\n[2]No\n");
-	scanf("%d", &type);
+	if (scanf("%d", &type) != 1) {
+		printf("\n");
+	}
 	fgetc(stdin);
 	
 	if (type == 1)
@@ -531,7 +575,12 @@ void doctor_appointment()
 	}
 
 	printf("Would you like to receive a phone reminder day before the appointment?\nPlease choose:\n[Y]For yes [N]For no\n");
-	scanf("%c", &reminder);
+	if (scanf("%c", &reminder) != 1) {
+		printf("\n");
+	}
+	fgetc(stdin);
+
+
 
 	fseek(p4, 0, SEEK_END);
 	fprintf(p4, "%s, %s, %s, \%d\/\%d\/\%d\, %s, %s, %c\n", typeAP, city, doctortype, day, month, year, time, reason, reminder);
@@ -565,7 +614,7 @@ void editprofile(int select)
 				exit(1);
 			}
 
-			while (fgets(data.email, sizeof(doctor), p3))
+			while (fgets(data.email, 50, p3))
 			{
 				char* temp;
 				temp = strtok(data.email, ",");
