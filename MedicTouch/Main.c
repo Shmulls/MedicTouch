@@ -33,6 +33,8 @@ void patient_menu();		// Ido
 void nurse_appointment();	// Rita
 void lab_appointment();		// Rita
 void doctor_appointment();	// Lir
+void editprofile(int select);
+void doctorcalendar();
 
 int main()
 {
@@ -318,7 +320,7 @@ void login()
 			else
 			{
 				printf("Welcome to MedicTouch Dr.%s!\n\n", username);
-				void doctor_menu();
+				doctor_menu();
 			}
 		}
 		else
@@ -349,23 +351,29 @@ void login()
 void doctor_menu()
 {
 	//Hadar
-
 	int select;
-	printf("[1]Edit doctor profile\n[2]Doctor calendar\n[3]Return to main menu\n");
-
-	scanf("%d", &select);
 
 	do 
 	{
+		
+		printf("[1]Edit doctor profile\n[2]Doctor calendar\n[3]Return to main menu\n");
+
+		scanf("%d", &select);
 		switch (select)
 		{
 		case 1:
 		{
-			break;
+			int select;
+			printf("Choose section to update in your profile\n");
+			printf("[1]City\n[2]Birthdate\n[3]Email\n[4]Expertise\n[5]Phone number\n");
+			scanf("%d", &select);
+
+			editprofile(select);
 		}
 
 		case 2:
 		{
+			doctorcalendar();
 			break;
 		}
 
@@ -516,4 +524,71 @@ void doctor_appointment()
 
 	fclose(p4);
 	free(typeAP);
+}
+
+void editprofile(int select)
+{
+	printf("[1]City\n[2]Birthdate\n[3]Email\n[4]Expertise\n[5]Phone number\n");
+
+	switch (select)
+	{
+		case 1:	
+		{
+			doctor data;
+			FILE* p3;
+			int found = 0;
+			char email[50];
+
+			fgets(email, 50, stdin);
+			email[strlen(email) - 1] = 0;
+
+			p3 = fopen("Doctor.csv", "r");
+			if (p3 == NULL)
+			{
+				printf("Error opening file\n");
+				exit(1);
+			}
+
+			while (fgets(data.email, sizeof(doctor), p3))
+			{
+				char* temp;
+				temp = strtok(data.email, ",");
+
+				while (temp != NULL)
+				{
+					if (strcmp(temp, email) == 0)
+					{
+						found = 1;
+						break;
+					}
+					temp = strtok(NULL, ",");
+				}
+			}
+			fclose(p3);
+		}
+				
+		break;
+	}
+}
+void doctorcalendar()
+{
+	patient data;
+	FILE* p3;
+
+	char buffer[255] = { 0 };
+	p3 = fopen("DoctorCalendar.csv","r");
+	if (p3 == NULL)
+	{
+		printf("\n Failed to open file!");
+	}
+	else 
+	{
+		while ((fgets(buffer, 255, p3)) != NULL /*&& fgetc(p3) != EOF */ )
+		{
+			puts(buffer);
+			/* Some processing */
+		}
+		fclose(p3);
+	}
+	//DoctorCalendar
 }
