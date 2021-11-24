@@ -27,6 +27,7 @@ bool check_username(char username[20], int *counter);
 bool check_password(char password[20], int counter);
 bool check_usernamep(char username[20], int *counter);
 bool check_passwordp(char password[20], int counter);
+bool IsOccupied(char* time, char* date);
 void create_user();
 void login();
 void doctor_menu();			// Hadar
@@ -36,7 +37,6 @@ void lab_appointment();		// Rita
 void doctor_appointment();	// Lir
 void editprofile(int select);
 void doctorcalendar();
-bool IsOccupied(char *time, char* date);
 void setCalendar(char *time, char *date);
 
 int main()
@@ -281,9 +281,13 @@ void create_user()
 				printf("This username already exists, try again.\n\n");
 		} while (check_username(temp_username, &counter));
 
-		printf("Enter password:\n");
-		fgets(data.password, 20, stdin);
-		data.password[strlen(data.password) - 1] = 0;
+		do
+		{
+			printf("Enter password:\n");
+			printf("notice->Password number contains 20 letters!");
+			fgets(data.password, 20, stdin);
+			data.password[strlen(data.password) - 1] = 0;
+		} while (strlen(data.password) > 21);
 
 		printf("Enter birthdate (in this template-->[day/month/year]):\n");
 		fgets(data.date, 50, stdin);
@@ -295,25 +299,40 @@ void create_user()
 		}
 		fgetc(stdin);*/
 
-		printf("Enter Expertise:\n");
-		fgets(data.expertise, 20, stdin);
-		data.expertise[strlen(data.expertise) - 1] = 0;
+		do
+		{
+			printf("Enter Expertise:\n");
+			fgets(data.expertise, 20, stdin);
+			printf("notice->Email number contains 20 letters!");
+			data.expertise[strlen(data.expertise) - 1] = 0;
+		} while (strlen(data.password) > 21);
 
-		printf("Enter email address:\n");
-		fgets(data.email, 50, stdin);
-		data.email[strlen(data.email) - 1] = 0;
+		do
+		{
+			printf("Enter email address:\n");
+			printf("notice->Email number contains 50 letters!");
+			fgets(data.email, 50, stdin);
+			data.email[strlen(data.email) - 1] = 0;
+		} while (strlen(data.email) > 51);
 
-		printf("Enter phone number:\n");
-		if (scanf(" %ld", &data.phone_number) != 1) {
+		do
+		{
+			printf("Enter phone number:\n");
+			printf("notice->Phone number contains 10 digits!");
+			if (scanf(" %ld", &data.phone_number) != 1) {
+				printf("\n");
+			}
+			fgetc(stdin);
+		} while (data.phone_number > 10 || data.phone_number < 0);
+
+		do
+		{
+			printf("Enter gender:\n[M] Man / [W] Woman / [O] Other:\n");
+			if (scanf(" %c", &data.gender) != 1) {
 			printf("\n");
-		}
+			}
 		fgetc(stdin);
-
-		printf("Enter gender:\n[M] Man / [W] Woman / [O] Other:\n");
-		if (scanf(" %c", &data.gender) != 1) {
-			printf("\n");
-		}
-		fgetc(stdin);
+		} while (!(data.gender == 'M' || data.gender == 'N' || data.gender == 'O'));
 
 		fseek(p2, 0, SEEK_END);
 		/*fprintf(p2, "%s,%s,\%d\/\%d\/\%d\,%s,%s,%ld,%c\n", data.user_name, data.password, data.day, data.month, data.year, data.expertise, data.email, data.phone_number, data.gender);*/
@@ -341,10 +360,14 @@ void create_user()
 			if (check_usernamep(temp_username, &counter))
 				printf("This username already exists, try again.\n\n");
 		} while (check_usernamep(temp_username, &counter));
-		
-		printf("Enter password:\n");
-		fgets(data.password, 20, stdin);
-		data.password[strlen(data.password) - 1] = 0;
+
+		do
+		{
+			printf("Enter password:\n");
+			printf("notice->Password number contains 20 letters!");
+			fgets(data.password, 20, stdin);
+			data.password[strlen(data.password) - 1] = 0;
+		} while(strlen(data.password) > 21);
 
 		/*printf("Enter birthdate [day/month/year]:\n");
 		if (scanf(" %d%d%d", &data.day, &data.month, &data.year) != 1) {
@@ -356,20 +379,30 @@ void create_user()
 		fgets(data.date, 50, stdin);
 		data.date[strlen(data.date) - 1] = 0;
 
-		printf("Enter email address:\n");
-		fgets(data.email, 50, stdin);
-		data.email[strlen(data.email) - 1] = 0;
+		do
+		{
+			printf("Enter email address:\n");
+			fgets(data.email, 50, stdin);
+			data.email[strlen(data.email) - 1] = 0;
+		} while (strlen(data.email) > 51);
 		
-		printf("Enter phone number:\n");
-		if (scanf("%ld", &data.phone_number) != 1) {
+		do
+		{
+			printf("Enter phone number:\n");
+			if (scanf("%ld", &data.phone_number) != 1) {
 			printf("\n");
-		}
-		fgetc(stdin);
+			}
+			fgetc(stdin);
+		} while (data.phone_number > 10 || data.phone_number < 0);
 
-		printf("Enter gender:\n[M] Man / [W] Woman / [O] Other:\n");
-		if (scanf(" %c", &data.gender) != 1) {
+
+		do
+		{
+			printf("Enter gender:\n[M] Man / [W] Woman / [O] Other:\n");
+			if (scanf(" %c", &data.gender) != 1) {
 			printf("\n");
-		}
+			}
+		} while (!(data.gender == 'M' || data.gender == 'N' || data.gender == 'O'));
 
 		fseek(p1, 0, SEEK_END);
 		/*fprintf(p1, "%s,%s,\%d\/\%d\/\%d\,%s,%ld,%c\n", data.user_name, data.password, data.day, data.month, data.year, data.email, data.phone_number, data.gender);*/
@@ -706,8 +739,7 @@ void doctorcalendar()
 	}
 	//DoctorCalendar
 }
-
-bool IsOccupied(char *time, char* date)
+bool IsOccupied(char *time, char *date)
 {
 	doctor data;
 	int found = 0, found2 = 0;
@@ -729,12 +761,18 @@ bool IsOccupied(char *time, char* date)
 		char* temp, *temp2;
 		temp = strtok(date, ",");
 
+		if (found == 1)
+			break;
+
 		while(temp != NULL)
 		{
 			if (found2 == 1)
 				break;
 			if (strcmp(temp, date) == 0)
 			{
+				if (found2 == 1)
+					break;
+
 						found = 1;
 						temp2 = strtok(time, ",");
 						while (temp2 != NULL)
@@ -760,7 +798,6 @@ bool IsOccupied(char *time, char* date)
 	if (found == 0 && found2 == 0)
 		return true;
 }
-
 void setCalendar(char *time, char* date)
 {
 		FILE* p6 = fopen("DoctorCalendar.csv", "r+");
