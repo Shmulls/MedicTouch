@@ -649,7 +649,6 @@ void doctor_appointment()
 	}
 
 	fseek(p4, 0, SEEK_END);
-	/*fprintf(p4, "%s,%s,%s,\%d\/\%d\/\%d\,%s,%s,%c\n", typeAP, city, doctortype, day, month, year, time, reason, reminder);*/
 	fprintf(p4, "%s,%s,%s,%s,%s,%s,%s\n", id, typeAP, city, doctortype, date, time, reason);
 	printf(">The appoinetment is set!<\n\n");
 
@@ -974,7 +973,7 @@ void ViewDoc(char *id)
 {
 	appoinetment data;
 	FILE* p2;
-	int found = 0, counter = 0;
+	int flag = 0, counter = 0, line = 0;
 
 	printf("\n");
 
@@ -993,29 +992,34 @@ void ViewDoc(char *id)
 		
 		temp = strtok(data.id, ",");
 
-		if (found == 1)
+		if (flag == 1)
 			break;
 
 		while (temp != NULL)
 		{
 			counter++;
+			if (counter == 3)
+			{
+				counter = 0;
+				line++;
+			}
 			if (strcmp(temp, id) == 0)
 			{
-				found = 1;
+				flag = 1;
 				break;
 			}
 			temp = strtok(NULL, ",");
 		}
 	}
 	fclose(p2);
+	
 
-	if (found == 1)
+	if (flag == 1)
 	{
-		doctor data;
+		appoinetment data;
 		FILE* p3;
 		int foundit = 0;
-		int oldcount = counter;
-		int newcount = 0;
+		int newline = 0;
 
 		char buffer[255] = { 0 };
 
@@ -1026,19 +1030,27 @@ void ViewDoc(char *id)
 			exit(1);
 		}
 
-			while ((fgets(buffer, 255, p3)) != NULL /*&& fgetc(p3) != EOF */)
+		while (fscanf(p3, "%s", buffer))
+		{
+			if (foundit == 1)
+				break;
+
+			sscanf(buffer, "%s,%s\n", data.time, data.date);
+
+			if (newline == line)
 			{
-				if(newcount == (oldcount+1))
 				puts(buffer);
-				if (newcount == (oldcount + 2))
-				puts(buffer);
-				else
-					newcount++;
-				
-				/* Some processing */
+				foundit = 1;
+				break;
 			}
+			else
+				newline++;
+		}
 		fclose(p3);
 	}
+	if (flag == 0)
+		printf("No doctor future appoinetments\n");
 }
+
 		
 
