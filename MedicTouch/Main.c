@@ -36,6 +36,7 @@ bool check_usernamep(char username[20], int *counter);
 bool check_passwordp(char password[20], int counter);
 bool OccupiedApp(char date[], char time[]);
 bool IsOccupied(char* time, char* date);
+bool findtime(appoinetment globalobj, char time[], int* index);
 void create_user();
 void login();
 void doctor_menu();			// Hadar
@@ -60,7 +61,7 @@ int main()
 
 	do
 	{
-		printf("Choose operation:\n[1]Create user\n[2]Login\n[3]Password recovery\n[0]Exit\n");
+		printf("\nChoose operation:\n[1]Create user\n[2]Login\n[3]Password recovery\n[0]Exit\n");
 		if (scanf("%d", &menu) != 1) {
 			printf("\n");
 		}
@@ -328,16 +329,19 @@ bool IsOccupied(char* time, char* date)
 }
 bool findtime(appoinetment globalobj, char time[], int* index)
 {
-	for (int i = 0; i < 18; i++)
-	{
-		if (strcmp(globalobj.time[i], time) == 0)
-		{
-			index = i;
-			strcpy(globalobj.time[i], "N/A");
-			return true;
-		}
-	}
+	int counter = 0;
 
+		while (counter < 17)
+		{
+			if (strcmp(globalobj.time[counter], time) == 0)
+			{
+				index = 1;
+				strcpy(globalobj.time[counter], "N/A");
+				return true;
+			}
+			counter++;
+		}
+	
 	return false;
 }
 bool OccupiedApp(char date[], char time[])
@@ -345,10 +349,8 @@ bool OccupiedApp(char date[], char time[])
 	FILE* fic = fopen("AvailableAppoinetments.csv", "r");
 	if (fic == NULL)
 		exit(1);
-	int flag = 0;
-	const char* timechange;
-	timechange = "N/A";
 	int index = -1;
+	int counter;
 
 	for (int i = 0; i < 5; i++)
 	{
@@ -803,123 +805,6 @@ void editprofile(int select)
 		break;
 	}
 }
-//void AvailableAppoinetments()
-//{
-//	FILE* p3;
-//	const char *date0, *date1, *date2, *date3, *date4;
-//	const char* time0, * time1, * time2, * time3, * time4, * time5, *time6;
-//	date0 = "05/12/21";
-//	date1 = "06/12/21";
-//	date2 = "07/12/21";
-//	date3 = "08/12/21";
-//	date4 = "09/12/21";
-//
-//	time0 = "08:00";
-//	time1 = "08:30";
-//	time2 = "09:00";
-//	time3 = "09:30";
-//	time4 = "10:00";
-//	time5 = "10:30";
-//	time6 = "11:00";
-//
-//	p3 = fopen("AvailableAppoinetments.csv", "r+");
-//	if (p3 == NULL)
-//	{
-//		printf("\nAvailableAppoinetments.csv failed.\n");
-//		exit(1);
-//	}
-//
-//	globaldata = (appoinetment**)malloc(5*sizeof(appoinetment*));
-//
-//	for (int i = 0; i < 5; i++)
-//	{
-//		globaldata[i] = (appoinetment*)malloc(7 * sizeof(appoinetment));
-//		if (globaldata[i] == NULL)
-//		{
-//			printf("\nAvailableAppoinetment\n");
-//			exit(1);
-//		}
-//	}
-//
-//	for (int i = 0; i < ROWS; i++)
-//	{
-//		for (int j = 0; j < COLS; j++)
-//		{
-//			if (j == 0 && i == 0)
-//			{
-//				strcpy(globaldata[i][j].date, date0);
-//				fprintf(p3, "%s,", globaldata[i][j].date);
-//			}
-//
-//			if (j == 0 && i == 1)
-//			{
-//				strcpy(globaldata[i][j].date, date1);
-//				fprintf(p3, "%s,", globaldata[i][j].date);
-//			}
-//
-//			if (j == 0 && i == 2)
-//			{
-//				strcpy(globaldata[i][j].date, date2);
-//				fprintf(p3, "%s,", globaldata[i][j].date);
-//			}
-//
-//			if (j == 0 && i == 3)
-//			{
-//				strcpy(globaldata[i][j].date, date3);
-//				fprintf(p3, "%s,", globaldata[i][j].date);
-//			}
-//
-//			if (j == 0 && i == 4)
-//			{
-//				strcpy(globaldata[i][j].date, date4);
-//				fprintf(p3, "%s,", globaldata[i][j].date);
-//			}
-//
-//			if (j == 6)
-//			{
-//				strcpy(globaldata[i][j].time, time6);
-//				fprintf(p3, "%s\n", globaldata[i][j].time);
-//			}
-//
-//			if (j == 5)
-//			{
-//				strcpy(globaldata[i][j].time, time5);
-//				fprintf(p3, "%s,", globaldata[i][j].time);
-//			}
-//
-//			if (j == 4)
-//			{
-//				strcpy(globaldata[i][j].time, time4);
-//				fprintf(p3, "%s,", globaldata[i][j].time);
-//			}
-//
-//			if (j == 3)
-//			{
-//				strcpy(globaldata[i][j].time, time3);
-//				fprintf(p3, "%s,", globaldata[i][j].time);
-//			}
-//
-//			if (j == 2)
-//			{
-//				strcpy(globaldata[i][j].time, time2);
-//				fprintf(p3, "%s,", globaldata[i][j].time);
-//			}
-//
-//			if (j == 1)
-//			{
-//				strcpy(globaldata[i][j].time, time1);
-//				fprintf(p3, "%s,", globaldata[i][j].time);
-//			}
-//
-//			if (j == 0)
-//			{
-//				strcpy(globaldata[i][j].time, time0);
-//				fprintf(p3, "%s,", globaldata[i][j].time);
-//			}
-//		}
-//	}
-//	fclose(p3);
-//}
 void printfAvailableAppoinetments()
 {
 	appoinetment data;
@@ -1149,10 +1034,10 @@ void RebootAppoinetments()
 {
 	FILE* p3;
 	const char* date0, * date1, * date2, * date3, * date4;
-	int counter = 1;
+	int counter = 1, max = 0;
 	char* dates[5] = { "05/12/21" ,"06/12/21" ,"07/12/21" ,"08/12/21" ,"09/12/21" };
 
-	p3 = fopen("AvailableAppoinetments.csv", "r+");
+	p3 = fopen("AvailableAppoinetments.csv", "w");
 	if (p3 == NULL)
 	{
 		printf("\nAvailableAppoinetments.csv failed.\n");
@@ -1166,15 +1051,19 @@ void RebootAppoinetments()
 
 	for (int i = 0; i < ROWS; i++)
 	{
-		counter = 1;
+		if(max == 1)
+		fprintf(p3, "\n", globaldata[i].time[counter]);
+
+		counter = 0;
 		strcpy(globaldata[i].date, dates[i]);
 		fprintf(p3, "%s,", globaldata[i].date);
 
-		while(counter < 18)
+		while(counter < 17)
 		{
-			if (counter == 17)
+			if (counter == 16)
 			{
-				fprintf(p3, "%s\n", globaldata[i].time[counter]);
+				fprintf(p3, "%s", globaldata[i].time[counter]);
+				max = 1;
 			}
 			else
 				fprintf(p3, "%s,", globaldata[i].time[counter]);
@@ -1186,8 +1075,8 @@ void RebootAppoinetments()
 void UpdateAppoinetments()
 {
 	int counter = 1;
-	char timz[10], date[20], buffer[2500];
-	int size = 0, found = 0;
+	char timz[10], date[20], buffer[3000];
+	int size = 0, found = 0, seccount = 0;
 	FILE* p3 = fopen("AvailableAppoinetments.csv", "r");
 	if (!p3)
 	{
@@ -1204,39 +1093,19 @@ void UpdateAppoinetments()
 		globaldata[i].time = (char**)malloc(sizeof(char*) * 17);
 	}
 
-	//for (int i = 0; i < ROWS; i++)
-	//{
-	//	counter = 1;
-	//	fscanf(p3, "%[^,]", globaldata[i].date);
-
-	//
-	//		while (counter < 18)
-	//		{
-	//				if (counter == 17)
-	//				{
-	//					fscanf(p3, "[^\n]", timz);
-	//					globaldata[i].time[counter] = (char*)malloc(sizeof(char) * (strlen(timz) + 1));
-	//					strcpy(globaldata[i].time[counter], timz);
-	//				}
-	//				else
-	//				{
-	//					fscanf(p3, "%[^,]", timz);
-	//					globaldata[i].time[counter] = (char*)malloc(sizeof(char) * (strlen(timz) + 1));
-	//					strcpy(globaldata[i].time[counter], timz);
-	//				}
-	//				counter++;
-	//		}
-
-	//}
-
 
 	while (fgets(buffer, sizeof(buffer), p3))
 	{
+		if (seccount == 90)
+			break;
+
 		char* temp;
 		temp = strtok(buffer, ",");
 
 		while (temp != NULL)
 		{
+			if (seccount == 90)
+				break;
 			found = 0;
 
 			for (int i = size; i < ROWS; i++)
@@ -1244,31 +1113,84 @@ void UpdateAppoinetments()
 				if (found == 1)
 					break;
 				counter = 0;
-				fscanf(p3, "%[^,]", globaldata[i].date);
+
+				strcpy(globaldata[i].date, temp);
+				seccount++;
 				temp = strtok(NULL, ",");
 
 				while (counter < 17)
 				{
 					if (counter == 16)
 					{
-						fscanf(p3, "%[^,]", timz);
 						globaldata[i].time[counter] = (char*)malloc(sizeof(char) * (strlen(timz) + 1));
-						strcpy(globaldata[i].time[counter], timz);
+						strcpy(globaldata[i].time[counter], temp);
 						size++;
 						found = 1;
-						temp = strtok(NULL, "\n");
+						seccount++;
+						temp = strtok(NULL, ",");
 					}
 					else
 					{
-						fscanf(p3, "%[^,]", timz);
 						globaldata[i].time[counter] = (char*)malloc(sizeof(char) * (strlen(timz) + 1));
-						strcpy(globaldata[i].time[counter], timz);
+						strcpy(globaldata[i].time[counter], temp);
+						seccount++;
 						temp = strtok(NULL, ",");
 					}
 					counter++;
 				}
 
 			}
+		}
+	}
+	fclose(p3);
+
+
+	for (int i = 0; i < ROWS; i++)
+	{
+
+		counter = 0;
+		printf("%s,", globaldata[i].date);
+
+		while (counter < 17)
+		{
+			if (counter == 16)
+			{
+				printf("%s", globaldata[i].time[counter]);
+			}
+			else
+			{
+				printf("%s,", globaldata[i].time[counter]);
+			}
+			counter++;
+		}
+
+	}
+
+	FILE* p4;
+	int countmax = 1;
+
+
+	p4 = fopen("AvailableAppoinetmentsTest.csv", "w");
+	if (p4 == NULL)
+	{
+		printf("\nAvailableAppoinetmentsTest.csv failed.\n");
+		exit(1);
+	}
+
+	for (int i = 0; i < ROWS; i++)
+	{
+		countmax = 0;
+		fprintf(p4, "%s,", globaldata[i].date);
+
+		while (countmax < 17)
+		{
+			if (countmax == 16)
+			{
+				fprintf(p4, "%s", globaldata[i].time[countmax]);
+			}
+			else
+				fprintf(p4, "%s,", globaldata[i].time[countmax]);
+			countmax++;
 		}
 	}
 	fclose(p3);
@@ -1300,9 +1222,9 @@ return insertime;
 void update()
 {
 	FILE* p3;
-	int counter = 1;
+	int counter = 0;
 
-	p3 = fopen("AvailableAppoinetments.csv", "r+");
+	p3 = fopen("AvailableAppoinetments.csv", "w");
 	if (p3 == NULL)
 	{
 		printf("\nAvailableAppoinetments.csv failed.\n");
@@ -1311,14 +1233,14 @@ void update()
 
 	for (int i = 0; i < ROWS; i++)
 	{
-		counter = 1;
+		counter = 0;
 		fprintf(p3, "%s,", globaldata[i].date);
 
-		while (counter < 18)
+		while (counter < 17)
 		{
-			if (counter == 17)
+			if (counter == 16)
 			{
-				fprintf(p3, "%s\n", globaldata[i].time[counter]);
+				fprintf(p3, "%s", globaldata[i].time[counter]);
 			}
 			else
 				fprintf(p3, "%s,", globaldata[i].time[counter]);
