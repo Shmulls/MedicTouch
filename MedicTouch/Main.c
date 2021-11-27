@@ -30,33 +30,55 @@ typedef struct appoinetment
 
 appoinetment *globaldata = NULL;
 
-bool check_username(char username[20], int *counter);
-bool check_password(char password[20], int counter);
-bool check_usernamep(char username[20], int *counter);
+//Visitor
+void create_user();
+void login();
+void RebootAppoinetmentsDoc();
+
+//Patient
+bool check_usernamep(char username[20], int* counter);
 bool check_passwordp(char password[20], int counter);
 bool OccupiedApp(char date[], char time[]);
 bool IsOccupied(char* time, char* date);
 bool findtime(appoinetment globalobj, char time[], int* index);
-void create_user();
-void login();
-void doctor_menu();			// Hadar
-void patient_menu();		// Ido
-void nurse_appointment();	// Rita
-void lab_appointment();		// Rita
-void doctor_appointment();	// Lir
-void editprofile(int select);
-void RebootAppoinetments();
-void setCalendar(char* id, char* date, char* time);
-void ViewDoc(char *id);
-void printfAvailableAppoinetments();
-char** apps();
-void update();
-void updatetime(char** timez);
+char** Loadtime();
+void UpdateAPfile();
+void SortimeArray(char** timez);
 void UpdateAppoinetments();
+void patient_menu();
+void doctor_appointment();
+void setCalendar(char id[], char date[], char time[]);
+void printfAvailableAppoinetments();
 
+//Doctor
+bool check_username(char username[20], int* counter);
+bool check_password(char password[20], int counter);
+void doctor_menu();
+void printfCalendar();
+void ViewDoc(char* id);
+void editprofile(int select);
+void CancelDoctor(char* id);
+
+//Nurse
+void nurse_appointment();
+void RebootAppoinetmentsNurse();
+void printfAvailableAppoinetmentsNurse();
+void setCalendarNurse(char id[], char date[], char time[]);
+void ViewNurse(char* id);
+void CancelNurse(char* id);
+
+//Lab
+void lab_appointment();
+void RebootAppoinetmentsLab();
+void printfAvailableAppoinetmentsLab();
+void setCalendarLab(char id[], char date[], char time[]);
+void ViewLab(char* id);
+
+//Main
 int main()
 {
 	int menu;
+	/*RebootAppoinetmentsDoc();*/
 	UpdateAppoinetments();
 
 	do
@@ -81,101 +103,277 @@ int main()
 
 	return 0;
 }
-bool check_username(char username[20], int *counter)
+
+//Visitor
+void create_user()
 {
-	doctor data;
-	FILE* p2;
-	int found = 0, rawcounter = 0;
-
-	p2 = fopen("Doctor.csv", "r");
-
-	if (p2 == NULL)
-	{
-		printf("Error opening file\n");
-		exit(1);
+	int selection;
+	char temp_username[20];
+	printf("Choose:\n[1]Doctor\n[2]Patient\n");
+	if (scanf("%d", &selection) != 1) {
+		printf("\n");
 	}
+	fgetc(stdin);
 
-	fseek(p2, 65, SEEK_SET);
-
-	while (fgets(data.user_name, 20, p2))
+	switch (selection)
 	{
-		char* temp;
-		temp = strtok(data.user_name, ",");
-
-		if (found == 1)
-			break;
-
-		while (temp != NULL)
+	case 1:
+	{
+		doctor data;
+		int counter = 0;
+		FILE* p2 = fopen("Doctor.csv", "r+");
+		if (p2 == NULL)
+			exit(1);
+		do
 		{
-			rawcounter++;
-			if (strcmp(temp, username) == 0)
-			{
-				found = 1;
-				break;
-			}
-			temp = strtok(NULL, ",");
+			printf("Enter username:\n");
+			fgets(data.user_name, 20, stdin);
+			data.user_name[strlen(data.user_name) - 1] = 0;
+			strcpy(temp_username, data.user_name);
+			if (check_username(temp_username, &counter))
+				printf("This username already exists, try again.\n\n");
+		} while (check_username(temp_username, &counter));
+
+		do
+		{
+			printf("Enter password:\n");
+			printf("notice->Password number contains 20 letters!");
+			fgets(data.password, 20, stdin);
+			data.password[strlen(data.password) - 1] = 0;
+		} while (strlen(data.password) > 21);
+
+		printf("Enter birthdate (in this template-->[day/month/year]):\n");
+		fgets(data.date, 50, stdin);
+		data.date[strlen(data.date) - 1] = 0;
+
+		/*printf("Enter birthdate [day/month/year]:\n");
+		if (scanf("%d%d%d", &data.day, &data.month, &data.year) != 1) {
+			printf("\n");
 		}
-	}
-	*counter = rawcounter;
-	fclose(p2);
-	if (found == 1)
-		return true;
-	else
-		return false;
-}
-bool check_password(char password[20], int counter)
-{
-	doctor data;
-	FILE* p3;
-	int found = 0, rawcounter = 0;
+		fgetc(stdin);*/
 
-	p3 = fopen("Doctor.csv", "r");
-	if (p3 == NULL)
-	{
-		printf("Error opening file\n");
-		exit(1);
-	}
-
-	fseek(p3, 65, SEEK_SET);
-
-	while (fgets(data.password, 20, p3))
-	{
-		char* temp;
-		temp = strtok(data.password, ",");
-
-		if (found == 1)
-			break;
-
-		while (temp != NULL)
+		do
 		{
-			if (rawcounter > (counter + 5)) //this method used for search by line data of the user. if the search method finish to read user data raw the program will break;
+			printf("Enter Expertise:\n");
+			fgets(data.expertise, 20, stdin);
+			printf("notice->Email number contains 20 letters!");
+			data.expertise[strlen(data.expertise) - 1] = 0;
+		} while (strlen(data.password) > 21);
+
+		do
+		{
+			printf("Enter email address:\n");
+			printf("notice->Email number contains 50 letters!");
+			fgets(data.email, 50, stdin);
+			data.email[strlen(data.email) - 1] = 0;
+		} while (strlen(data.email) > 51);
+
+		do
+		{
+			printf("Enter phone number:\n");
+			printf("notice->Phone number contains 10 digits!");
+			if (scanf(" %ld", &data.phone_number) != 1) {
+				printf("\n");
+			}
+			fgetc(stdin);
+		} while (!(data.phone_number > 9999999999 || data.phone_number < 1000000000));
+
+		do
+		{
+			printf("Enter gender:\n[M] Man / [W] Woman / [O] Other:\n");
+			if (scanf(" %c", &data.gender) != 1) {
+				printf("\n");
+			}
+			fgetc(stdin);
+		} while (!(data.gender == 'M' || data.gender == 'N' || data.gender == 'O'));
+
+		fseek(p2, 0, SEEK_END);
+		/*fprintf(p2, "%s,%s,\%d\/\%d\/\%d\,%s,%s,%ld,%c\n", data.user_name, data.password, data.day, data.month, data.year, data.expertise, data.email, data.phone_number, data.gender);*/
+		fprintf(p2, "%s,%s,%s,%s,%s,%ld,%c\n", data.user_name, data.password, data.date, data.expertise, data.email, data.phone_number, data.gender);
+
+		printf(">Welcome to MedicTouch Dr.%s<\n", data.user_name);
+
+		fclose(p2);
+		break;
+	}
+	case 2:
+	{
+		patient data;
+		int counter = 0;
+		FILE* p1 = fopen("Patient.csv", "r+");
+		if (p1 == NULL)
+			exit(1);
+
+		do
+		{
+			printf("Enter username:\n");
+			fgets(data.user_name, 20, stdin);
+			data.user_name[strlen(data.user_name) - 1] = 0;
+			strcpy(temp_username, data.user_name);
+			if (check_usernamep(temp_username, &counter))
+				printf("This username already exists, try again.\n\n");
+		} while (check_usernamep(temp_username, &counter));
+
+		do
+		{
+			printf("Enter password:\n");
+			printf("notice->Password number contains 20 letters!");
+			fgets(data.password, 20, stdin);
+			data.password[strlen(data.password) - 1] = 0;
+		} while (strlen(data.password) > 21);
+
+		/*printf("Enter birthdate [day/month/year]:\n");
+		if (scanf(" %d%d%d", &data.day, &data.month, &data.year) != 1) {
+			printf("\n");
+		}
+		fgetc(stdin);*/
+
+		printf("Enter birthdate (in this template-->[day/month/year]):\n");
+		fgets(data.date, 50, stdin);
+		data.date[strlen(data.date) - 1] = 0;
+
+		do
+		{
+			printf("Enter email address:\n");
+			fgets(data.email, 50, stdin);
+			data.email[strlen(data.email) - 1] = 0;
+		} while (strlen(data.email) > 51);
+
+		do
+		{
+			printf("Enter phone number:\n");
+			if (scanf("%ld", &data.phone_number) != 1) {
+				printf("\n");
+			}
+			fgetc(stdin);
+		} while (!(data.phone_number > 9999999999 || data.phone_number < 1000000000));
+
+
+		do
+		{
+			printf("Enter gender:\n[M] Man / [W] Woman / [O] Other:\n");
+			if (scanf(" %c", &data.gender) != 1) {
+				printf("\n");
+			}
+		} while (!(data.gender == 'M' || data.gender == 'N' || data.gender == 'O'));
+
+		fseek(p1, 0, SEEK_END);
+		/*fprintf(p1, "%s,%s,\%d\/\%d\/\%d\,%s,%ld,%c\n", data.user_name, data.password, data.day, data.month, data.year, data.email, data.phone_number, data.gender);*/
+		fprintf(p1, "%s,%s,%s,%s,%ld,%c\n", data.user_name, data.password, data.date, data.email, data.phone_number, data.gender);
+		printf(">Welcome to MedicTouch %s<\n", data.user_name);
+
+		fclose(p1);
+		break;
+	}
+	}
+}
+void login()
+{
+	char username[20] = { 0 }, password[20] = { 0 };
+	int menu, counter = 0;
+
+	printf("---->LOGIN AREA<----\n\n");
+	printf("Enter username: ");
+	fgets(username, 20, stdin);
+	username[strlen(username) - 1] = 0;
+
+	printf("Enter password: ");
+	fgets(password, 20, stdin);
+	password[strlen(password) - 1] = 0;
+
+	printf("Choose:\n[1]Doctor\n[2]Patient\n");
+	if (scanf("%d", &menu) != 1) {
+		printf("\n");
+	}
+	fgetc(stdin);
+
+	switch (menu)
+	{
+	case 1:
+	{
+		if (check_username(username, &counter))
+		{
+			if (!check_password(password, counter))
 			{
-				break;
+				printf("Invalid password\n\n");
 			}
 			else
 			{
-				rawcounter++;
-				if (strcmp(temp, password) == 0)
-				{
-					if (rawcounter < counter) //this method will ensure that the password check will be will search only in the correct raw.
-						return false;
-					else
-					{
-						found = 1;
-						break;
-					}
-				}
-				temp = strtok(NULL, ",");
+				printf("Welcome to MedicTouch Dr.%s!\n\n", username);
+				doctor_menu();
 			}
+		}
+		else
+			printf("Invalid username\n\n");
+		break;
+	}
+
+	case 2:
+	{
+		if (check_usernamep(username, &counter))
+		{
+			if (!check_passwordp(password, counter))
+			{
+				printf("Invalid password\n\n");
+			}
+			else
+			{
+				printf("Welcome to MedicTouch %s!\n\n", username);
+				patient_menu();
+			}
+		}
+		else
+			printf("Invalid username\n\n");
+		break;
+	}
+	}
+}
+void RebootAppoinetmentsDoc()
+{
+	FILE* p3;
+	const char* date0, * date1, * date2, * date3, * date4;
+	int counter = 1, max = 0;
+	char* dates[5] = { "05/12/21" ,"06/12/21" ,"07/12/21" ,"08/12/21" ,"09/12/21" };
+
+	p3 = fopen("AvailableAppoinetments.csv", "w");
+	if (p3 == NULL)
+	{
+		printf("\nAvailableAppoinetments.csv failed.\n");
+		exit(1);
+	}
+
+	globaldata = (appoinetment*)malloc(5 * sizeof(appoinetment));
+
+	char** temp = Loadtime();
+	SortimeArray(temp);
+
+	for (int i = 0; i < ROWS; i++)
+	{
+		if (max == 1)
+			fprintf(p3, "\n", globaldata[i].time[counter]);
+
+		counter = 0;
+		strcpy(globaldata[i].date, dates[i]);
+		fprintf(p3, "%s,", globaldata[i].date);
+
+		while (counter < 17)
+		{
+			if (counter == 16)
+			{
+				fprintf(p3, "%s", globaldata[i].time[counter]);
+				max = 1;
+			}
+			else
+				fprintf(p3, "%s,", globaldata[i].time[counter]);
+			counter++;
 		}
 	}
 	fclose(p3);
-	if (found == 1)
-		return true;
-	else
-		return false;
 }
-bool check_usernamep(char username[20], int *counter)
+void CancelLab(char* id);
+
+//Patient
+bool check_usernamep(char username[20], int* counter)
 {
 	patient data;
 	FILE* p2;
@@ -197,7 +395,7 @@ bool check_usernamep(char username[20], int *counter)
 		temp = strtok(data.user_name, ",");
 
 		if (found == 1)
-		break;
+			break;
 
 		while (temp != NULL)
 		{
@@ -327,23 +525,6 @@ bool IsOccupied(char* time, char* date)
 	if (found == 0 && found2 == 0)
 		return true;
 }
-bool findtime(appoinetment globalobj, char time[], int* index)
-{
-	int counter = 0;
-
-		while (counter < 17)
-		{
-			if (strcmp(globalobj.time[counter], time) == 0)
-			{
-				index = 1;
-				strcpy(globalobj.time[counter], "N/A");
-				return true;
-			}
-			counter++;
-		}
-	
-	return false;
-}
 bool OccupiedApp(char date[], char time[])
 {
 	FILE* fic = fopen("AvailableAppoinetments.csv", "r");
@@ -358,682 +539,57 @@ bool OccupiedApp(char date[], char time[])
 		{
 			if (findtime(globaldata[i], time, &index))
 			{
-				update();
+				UpdateAPfile();
 				break;
 			}
 		}
 	}
 }
-void create_user()
+bool findtime(appoinetment globalobj, char time[], int* index)
 {
-	int selection;
-	char temp_username[20];
-	printf("Choose:\n[1]Doctor\n[2]Patient\n");
-	if (scanf("%d", &selection) != 1) {
-		printf("\n");
-	}
-	fgetc(stdin);
+	int counter = 0;
 
-	switch (selection)
+	while (counter < 17)
 	{
-	case 1:
-	{
-		doctor data;
-		int counter = 0;
-		FILE* p2 = fopen("Doctor.csv", "r+");
-		if (p2 == NULL)
-			exit(1);
-		do
+		if (strcmp(globalobj.time[counter], time) == 0)
 		{
-			printf("Enter username:\n");
-			fgets(data.user_name, 20, stdin);
-			data.user_name[strlen(data.user_name) - 1] = 0;
-			strcpy(temp_username, data.user_name);
-			if (check_username(temp_username, &counter))
-				printf("This username already exists, try again.\n\n");
-		} while (check_username(temp_username, &counter));
-
-		do
-		{
-			printf("Enter password:\n");
-			printf("notice->Password number contains 20 letters!");
-			fgets(data.password, 20, stdin);
-			data.password[strlen(data.password) - 1] = 0;
-		} while (strlen(data.password) > 21);
-
-		printf("Enter birthdate (in this template-->[day/month/year]):\n");
-		fgets(data.date, 50, stdin);
-		data.date[strlen(data.date) - 1] = 0;
-
-		/*printf("Enter birthdate [day/month/year]:\n");
-		if (scanf("%d%d%d", &data.day, &data.month, &data.year) != 1) {
-			printf("\n");
+			index = 1;
+			strcpy(globalobj.time[counter], "N/A");
+			return true;
 		}
-		fgetc(stdin);*/
-
-		do
-		{
-			printf("Enter Expertise:\n");
-			fgets(data.expertise, 20, stdin);
-			printf("notice->Email number contains 20 letters!");
-			data.expertise[strlen(data.expertise) - 1] = 0;
-		} while (strlen(data.password) > 21);
-
-		do
-		{
-			printf("Enter email address:\n");
-			printf("notice->Email number contains 50 letters!");
-			fgets(data.email, 50, stdin);
-			data.email[strlen(data.email) - 1] = 0;
-		} while (strlen(data.email) > 51);
-
-		do
-		{
-			printf("Enter phone number:\n");
-			printf("notice->Phone number contains 10 digits!");
-			if (scanf(" %ld", &data.phone_number) != 1) {
-				printf("\n");
-			}
-			fgetc(stdin);
-		} while (!(data.phone_number > 9999999999 || data.phone_number < 1000000000));
-
-		do
-		{
-			printf("Enter gender:\n[M] Man / [W] Woman / [O] Other:\n");
-			if (scanf(" %c", &data.gender) != 1) {
-			printf("\n");
-			}
-		fgetc(stdin);
-		} while (!(data.gender == 'M' || data.gender == 'N' || data.gender == 'O'));
-
-		fseek(p2, 0, SEEK_END);
-		/*fprintf(p2, "%s,%s,\%d\/\%d\/\%d\,%s,%s,%ld,%c\n", data.user_name, data.password, data.day, data.month, data.year, data.expertise, data.email, data.phone_number, data.gender);*/
-		fprintf(p2, "%s,%s,%s,%s,%s,%ld,%c\n", data.user_name, data.password, data.date, data.expertise, data.email, data.phone_number, data.gender);
-
-		printf(">Welcome to MedicTouch Dr.%s<\n", data.user_name);
-
-		fclose(p2);
-		break;
+		counter++;
 	}
-	case 2:
-	{
-		patient data;
-		int counter = 0;
-		FILE* p1 = fopen("Patient.csv", "r+");
-		if (p1 == NULL)
-			exit(1);
 
-		do
-		{
-			printf("Enter username:\n");
-			fgets(data.user_name, 20, stdin);
-			data.user_name[strlen(data.user_name) - 1] = 0;
-			strcpy(temp_username, data.user_name);
-			if (check_usernamep(temp_username, &counter))
-				printf("This username already exists, try again.\n\n");
-		} while (check_usernamep(temp_username, &counter));
-
-		do
-		{
-			printf("Enter password:\n");
-			printf("notice->Password number contains 20 letters!");
-			fgets(data.password, 20, stdin);
-			data.password[strlen(data.password) - 1] = 0;
-		} while(strlen(data.password) > 21);
-
-		/*printf("Enter birthdate [day/month/year]:\n");
-		if (scanf(" %d%d%d", &data.day, &data.month, &data.year) != 1) {
-			printf("\n");
-		}
-		fgetc(stdin);*/
-
-		printf("Enter birthdate (in this template-->[day/month/year]):\n");
-		fgets(data.date, 50, stdin);
-		data.date[strlen(data.date) - 1] = 0;
-
-		do
-		{
-			printf("Enter email address:\n");
-			fgets(data.email, 50, stdin);
-			data.email[strlen(data.email) - 1] = 0;
-		} while (strlen(data.email) > 51);
-		
-		do
-		{
-			printf("Enter phone number:\n");
-			if (scanf("%ld", &data.phone_number) != 1) {
-			printf("\n");
-			}
-			fgetc(stdin);
-		} while (!(data.phone_number > 9999999999 || data.phone_number < 1000000000));
-
-
-		do
-		{
-			printf("Enter gender:\n[M] Man / [W] Woman / [O] Other:\n");
-			if (scanf(" %c", &data.gender) != 1) {
-			printf("\n");
-			}
-		} while (!(data.gender == 'M' || data.gender == 'N' || data.gender == 'O'));
-
-		fseek(p1, 0, SEEK_END);
-		/*fprintf(p1, "%s,%s,\%d\/\%d\/\%d\,%s,%ld,%c\n", data.user_name, data.password, data.day, data.month, data.year, data.email, data.phone_number, data.gender);*/
-		fprintf(p1, "%s,%s,%s,%s,%ld,%c\n", data.user_name, data.password, data.date, data.email, data.phone_number, data.gender);
-		printf(">Welcome to MedicTouch %s<\n", data.user_name);
-
-		fclose(p1);
-		break;
-	}
-	}
+	return false;
 }
-void login()
+char** Loadtime()
 {
-	char username[20] = { 0 }, password[20] = { 0 };
-	int menu, counter = 0;
-
-	printf("---->LOGIN AREA<----\n\n");
-	printf("Enter username: ");
-	fgets(username, 20, stdin);
-	username[strlen(username) - 1] = 0;
-
-	printf("Enter password: ");
-	fgets(password, 20, stdin);
-	password[strlen(password) - 1] = 0;
-
-	printf("Choose:\n[1]Doctor\n[2]Patient\n");
-	if (scanf("%d", &menu) != 1) {
-		printf("\n");
-	}
-	fgetc(stdin);
-
-	switch (menu)
+	int numcols;
+	char timz[8];
+	FILE* p1 = fopen("time.txt", "r");
+	if (!p1)
 	{
-	case 1:
-	{
-		if (check_username(username, &counter))
-		{
-			if (!check_password(password, counter))
-			{
-				printf("Invalid password\n\n");
-			}
-			else
-			{
-				printf("Welcome to MedicTouch Dr.%s!\n\n", username);
-				doctor_menu();
-			}
-		}
-		else
-			printf("Invalid username\n\n");
-		break;
+		printf("\nError, can't open your file");
+		return;
 	}
+	fscanf(p1, "%d", &numcols);
+	char** insertime = (char**)malloc(sizeof(char*) * numcols);
 
-	case 2:
+	for (int i = 0; i < numcols; i++)
 	{
-		if (check_usernamep(username, &counter))
-		{
-			if (!check_passwordp(password, counter))
-			{
-				printf("Invalid password\n\n");
-			}
-			else
-			{
-				printf("Welcome to MedicTouch %s!\n\n", username);
-				patient_menu();
-			}
-		}
-		else
-			printf("Invalid username\n\n");
-		break;
+		fscanf(p1, "%s", timz);
+		insertime[i] = (char*)malloc(sizeof(char) * (strlen(timz) + 1));
+		strcpy(insertime[i], timz);
+
 	}
-	}
+	fclose(p1);
+
+	return insertime;
 }
-void doctor_menu()
-{
-	//Hadar
-	int select;
-
-	do 
-	{
-		printf("\n");
-		printf("[1]Edit doctor profile\n[2]Doctor calendar\n[3]Return to main menu\n");
-		if (scanf("%d", &select) != 1) {
-			printf("\n");
-		}
-		fgetc(stdin);
-
-		switch (select)
-		{
-		case 1:
-		{
-			int select;
-			printf("Choose section to update in your profile\n");
-			printf("[1]City\n[2]Birthdate\n[3]Email\n[4]Expertise\n[5]Phone number\n");
-			if (scanf("%d", &select) != 1) {
-				printf("\n");
-			}
-
-			editprofile(select);
-		}
-
-		case 2:
-		{
-			RebootAppoinetments();
-			break;
-		}
-
-		case 3:
-		{
-			return;
-			break;
-		}
-
-		}
-	} while (select != 3);
-}
-void patient_menu()
-{
-	//Ido
-	//Call lir requirements functions (4) 
-	//Call Rita requirements functions (5,6) 
-	int select;
-	char id[20];
-
-	do
-	{
-		printf("[1]Schedule an appointment to doctor\n[2]Schedule an appointment to nurse\n[3]Schedule an appointment to lab tests\n[4]Cancel an existing appointment\n[5]View a list of future appointments\n[6]Log out\n");
-		if (scanf("%d", &select) != 1) {
-			printf("\n");
-		}
-		fgetc(stdin);
-
-		switch (select)
-		{
-			case 1:
-				doctor_appointment();	
-				break;
-			
-
-			case 2:
-				/*nurse_appointment();*/
-				break;
-			
-			case 3:
-				/*lab_appointment();*/
-				break;
-			
-
-			case 4:
-			
-				break;
-			
-
-			case 5:
-				printf("Enter id:\n");
-				fgets(id, 20, stdin);
-				id[strlen(id) - 1] = 0;
-				ViewDoc(&id);
-
-				break;
-			
-
-			case 6:
-			
-				break;
-		}
-	} while (select != 6);
-}
-void doctor_appointment()
-{
-	
-	char city[30], reason[200], doctortype[40], time[10], date[20], id[20];
-	char *typeAP = malloc(100);
-	int day, month, year, type, select;
-	
-
-	FILE* p4 = fopen("MakeAppointment.csv", "r+");
-	if (p4 == NULL)
-		exit(1);
-
-	printf("Please enter ID:\n");
-	fgets(id, 20, stdin);
-	id[strlen(id) - 1] = 0;
-
-	printf("Please choose your preferred type of appointment:\n[1]Face to face appointment\n[2]Phone appointment\n");
-	if (scanf("%d", &type) != 1) {
-		printf("\n");
-	}
-	fgetc(stdin);
-
-	if (type == 1)
-	{
-		strcpy(typeAP, "Face to face");
-		printf("Please enter the name of the city where the clinic you want to go is located:\n");
-		fgets(city, 30, stdin);
-		city[strlen(city) - 1] = 0;
-	}
-	else
-	{
-		strcpy(typeAP, "Phone");
-	}
-
-	printf("Please enter the type of doctor you would like to make an appointment with:\n");
-	fgets(doctortype, 40, stdin);
-	doctortype[strlen(doctortype) - 1] = 0;
-
-	printfAvailableAppoinetments();
-	printf("Please enter date from the list:\n");
-	printf("notice->Template for date is: [XX/XX/XXXX]\n");
-	fgets(date, 20, stdin);
-	date[strlen(date) - 1] = 0;
-
-	printf("Please enter time from the list:\n");
-	printf("notice->Template for time is: [XX:XX]\n");
-	fgets(time, 10, stdin);
-	time[strlen(time) - 1] = 0;
-
-	if (!OccupiedApp(date, time))
-		printf("Date\Time not avaible!\n");
-	setCalendar(id, date, time);
-
-	printf("Do you want sumbit a reason for the appoinetment?\n[1]Yes\n[2]No\n");
-	if (scanf("%d", &type) != 1) {
-		printf("\n");
-	}
-	fgetc(stdin);
-	
-	if (type == 1)
-	{
-		printf("Please the reason for the appoinetment\n->Notice: you can sumbit only 200 charcters\n");
-		fgets(reason, 200, stdin);
-		reason[strlen(reason) - 1] = 0;
-	}
-	else
-	{
-		strcpy(reason, "N/A");
-	}
-
-	fseek(p4, 0, SEEK_END);
-	fprintf(p4, "%s,%s,%s,%s,%s,%s,%s\n", id, typeAP, city, doctortype, date, time, reason);
-	printf(">The appoinetment is set!<\n\n");
-
-	fclose(p4);
-	free(typeAP);
-}
-void editprofile(int select)
-{
-	printf("[1]City\n[2]Birthdate\n[3]Email\n[4]Expertise\n[5]Phone number\n");
-
-	switch (select)
-	{
-		case 1:	
-		{
-			doctor data;
-			FILE* p3;
-			int found = 0;
-			char email[50];
-
-			fgets(email, 50, stdin);
-			email[strlen(email) - 1] = 0;
-
-			p3 = fopen("Doctor.csv", "r");
-			if (p3 == NULL)
-			{
-				printf("Error opening file\n");
-				exit(1);
-			}
-
-			while (fgets(data.email, 50, p3))
-			{
-				char* temp;
-				temp = strtok(data.email, ",");
-
-				while (temp != NULL)
-				{
-					if (strcmp(temp, email) == 0)
-					{
-						found = 1;
-						break;
-					}
-					temp = strtok(NULL, ",");
-				}
-			}
-			fclose(p3);
-		}
-				
-		break;
-	}
-}
-void printfAvailableAppoinetments()
-{
-	appoinetment data;
-	FILE* p3;
-
-	char buffer[255] = { 0 };
-
-	p3 = fopen("AvailableAppoinetments.csv", "r");
-	if (p3 == NULL)
-	{
-		printf("\n Failed to open file!");
-	}
-	else
-	{
-		while ((fgets(buffer, 255, p3)) != NULL /*&& fgetc(p3) != EOF */)
-		{
-			puts(buffer);
-			/* Some processing */
-		}
-	}
-	fclose(p3);
-}
-void setCalendar(char *id, char *date, char *time)
-{
-	appoinetment data;
-	FILE *p4;
-	
-
-	p4 = fopen("DoctorCalendar.csv", "r+"); 
-
-	strcpy(data.id, id);
-	strcpy(data.date, date);
-	strcpy(data.time, time);
-
-	fseek(p4, 0, SEEK_END);
-	fprintf(p4, "%s,%s,%s\n", data.id, data.date, data.time);
-
-	fclose(p4);
-}
-//void nurse_appointment()
-//{
-//	char city[30], apptype[40], time[10], date[20], id[20];
-//	char* typeAP = malloc(100);
-//	int type;
-//
-//	FILE* p6 = fopen("NurseAppointment.csv", "r+");
-//	if (p6 == NULL)
-//		exit(1);
-//
-//	printf("Please enter ID:\n");
-//	fgets(id, 20, stdin);
-//	id[strlen(id) - 1] = 0;
-//
-//	printf("Please enter the name of the city where the clinic you want to go is located:\n");
-//	fgets(city, 30, stdin);
-//	city[strlen(city) - 1] = 0;
-//
-//	printf("Please choose your preferred type of appointment:\n[1]Vaccine\n[2]Bandage change\n");
-//	scanf("%d", &type);
-//	if (type < 1 || type>2)
-//		printf("Error type\n");
-//	fgetc(stdin);
-//
-//	if (type == 1)
-//	{
-//		strcpy(typeAP, "Vaccine");
-//	}
-//	if (type == 2)
-//	{
-//		strcpy(typeAP, "Bandage change");
-//	}
-//
-//	/*AvailableAppoinetments();*/
-//	printf("Please enter date from the list:\n");
-//	fgets(date, 20, stdin);
-//	date[strlen(date) - 1] = 0;
-//
-//	printf("Please enter time from the list:\n");
-//	fgets(time, 10, stdin);
-//	time[strlen(time) - 1] = 0;
-//	setCalendar(&id, &date, &time);
-//
-//	fseek(p6, 0, SEEK_END);
-//	fprintf(p6, "%s,%s,%s,%s,%s\n", id, city, typeAP, date, time);
-//	printf(">The appoinetment to nurse is set!<\n\n");
-//
-//	fclose(p6);
-//	free(typeAP);
-//}
-//void lab_appointment()
-//{
-//		char city[30], apptype[40], time[10], date[20], id[20];
-//		char* typeAP = malloc(100);
-//		int type;
-//
-//		FILE* p6 = fopen("LabAppointment.csv", "r+");
-//		if (p6 == NULL)
-//			exit(1);
-//
-//		printf("Please enter ID:\n");
-//		fgets(id, 20, stdin);
-//		id[strlen(id) - 1] = 0;
-//
-//		printf("Please enter the name of the city where the clinic you want to go is located:\n");
-//		fgets(city, 30, stdin);
-//		city[strlen(city) - 1] = 0;
-//
-//		printf("Please choose your preferred type of appointment:\n[1]Antibodies test\n[2]Urine test\n[3]Blood test\n");
-//		scanf("%d", &type);
-//		if (type < 1 || type>3)
-//			printf("Error type\n");
-//		fgetc(stdin);
-//
-//		if (type == 1)
-//		{
-//			strcpy(typeAP, "Antibodies test");
-//		}
-//		if (type == 2)
-//		{
-//			strcpy(typeAP, "Urine test");
-//		}
-//		if (type == 3)
-//		{
-//			strcpy(typeAP, "Blood test");
-//		}
-//
-//		/*AvailableAppoinetments();*/
-//		printf("Please enter date from the list:\n");
-//		fgets(date, 20, stdin);
-//		date[strlen(date) - 1] = 0;
-//
-//		printf("Please enter time from the list:\n");
-//		fgets(time, 10, stdin);
-//		time[strlen(time) - 1] = 0;
-//		setCalendar(&id, &date, &time);
-//
-//		fseek(p6, 0, SEEK_END);
-//		fprintf(p6, "%s,%s,%s,%s,%s\n", id, city, typeAP, date, time);
-//		printf(">The appoinetment to nurse is set!<\n\n");
-//
-//		fclose(p6);
-//		free(typeAP);
-//}
-void ViewDoc(char *id)
-{
-	appoinetment data;
-	FILE* p2;
-	int flag = 0, counter = 0, line = 0;
-
-	printf("\n");
-
-	p2 = fopen("DoctorCalendar.csv", "r");
-
-	if (p2 == NULL)
-	{
-		printf("Error opening file\n");
-		exit(1);
-	}
-
-	fseek(p2, 0, SEEK_SET);
-	char* temp;
-	while (fgets(data.id, 20, p2))
-	{
-		
-		temp = strtok(data.id, ",");
-
-		if (flag == 1)
-			break;
-
-		while (temp != NULL)
-		{
-			counter++;
-			if (counter == 3)
-			{
-				counter = 0;
-				line++;
-			}
-			if (strcmp(temp, id) == 0)
-			{
-				flag = 1;
-				break;
-			}
-			temp = strtok(NULL, ",");
-		}
-	}
-	fclose(p2);
-	
-
-	if (flag == 1)
-	{
-		appoinetment data;
-		FILE* p3;
-		int foundit = 0;
-		int newline = 0;
-
-		char buffer[255] = { 0 };
-
-		p3 = fopen("DoctorCalendar.csv", "r");
-		if (p3 == NULL)
-		{
-			printf("Error opening file\n");
-			exit(1);
-		}
-
-		while (fscanf(p3, "%s", buffer))
-		{
-			if (foundit == 1)
-				break;
-
-			sscanf(buffer, "%s,%s\n", data.time, data.date);
-
-			if (newline == line)
-			{
-				puts(buffer);
-				foundit = 1;
-				break;
-			}
-			else
-				newline++;
-		}
-		fclose(p3);
-	}
-	if (flag == 0)
-		printf("No doctor future appoinetments\n");
-}
-void RebootAppoinetments()
+void UpdateAPfile()
 {
 	FILE* p3;
-	const char* date0, * date1, * date2, * date3, * date4;
-	int counter = 1, max = 0;
-	char* dates[5] = { "05/12/21" ,"06/12/21" ,"07/12/21" ,"08/12/21" ,"09/12/21" };
+	int counter = 0;
 
 	p3 = fopen("AvailableAppoinetments.csv", "w");
 	if (p3 == NULL)
@@ -1042,26 +598,16 @@ void RebootAppoinetments()
 		exit(1);
 	}
 
-	globaldata = (appoinetment*)malloc(5 * sizeof(appoinetment));
-
-	char** temp = apps();
-	updatetime(temp);
-
 	for (int i = 0; i < ROWS; i++)
 	{
-		if(max == 1)
-		fprintf(p3, "\n", globaldata[i].time[counter]);
-
 		counter = 0;
-		strcpy(globaldata[i].date, dates[i]);
 		fprintf(p3, "%s,", globaldata[i].date);
 
-		while(counter < 17)
+		while (counter < 17)
 		{
 			if (counter == 16)
 			{
 				fprintf(p3, "%s", globaldata[i].time[counter]);
-				max = 1;
 			}
 			else
 				fprintf(p3, "%s,", globaldata[i].time[counter]);
@@ -1069,7 +615,19 @@ void RebootAppoinetments()
 		}
 	}
 	fclose(p3);
-}		
+}
+void SortimeArray(char** timez)
+{
+	for (int i = 0; i < 5; i++)
+	{
+		globaldata[i].time = (char**)malloc(sizeof(char*) * 18);
+		for (int j = 0; j < 18; j++)
+		{
+			globaldata[i].time[j] = (char*)malloc(sizeof(char) * (strlen(timez[j]) + 1));
+			strcpy(globaldata[i].time[j], timez[j]);
+		}
+	}
+}
 void UpdateAppoinetments()
 {
 	int counter = 1;
@@ -1080,7 +638,7 @@ void UpdateAppoinetments()
 	{
 		printf("\nAvailableAppoinetments.csv - Error, cant open the file\n");
 		printf("Rebooting AvailableAppoinetments.csv...\n");
-		RebootAppoinetments();
+		RebootAppoinetmentsDoc();
 		return;
 	}
 
@@ -1143,26 +701,26 @@ void UpdateAppoinetments()
 	fclose(p3);
 
 
-	for (int i = 0; i < ROWS; i++)
-	{
+	//for (int i = 0; i < ROWS; i++)
+	//{
 
-		counter = 0;
-		printf("%s,", globaldata[i].date);
+	//	counter = 0;
+	//	printf("%s,", globaldata[i].date);
 
-		while (counter < 17)
-		{
-			if (counter == 16)
-			{
-				printf("%s", globaldata[i].time[counter]);
-			}
-			else
-			{
-				printf("%s,", globaldata[i].time[counter]);
-			}
-			counter++;
-		}
+	//	while (counter < 17)
+	//	{
+	//		if (counter == 16)
+	//		{
+	//			printf("%s", globaldata[i].time[counter]);
+	//		}
+	//		else
+	//		{
+	//			printf("%s,", globaldata[i].time[counter]);
+	//		}
+	//		counter++;
+	//	}
 
-	}
+	//}
 
 	FILE* p4;
 	int countmax = 1;
@@ -1193,45 +751,652 @@ void UpdateAppoinetments()
 	}
 	fclose(p3);
 }
-char** apps()
+void patient_menu()	
 {
-int numcols;
-char timz[8];
-FILE* neoray = fopen("time.txt", "r");
-if (!neoray)
-{
-	printf("\nError, can't open your file");
-	return;
-}
-fscanf(neoray, "%d", &numcols);
-char** insertime = (char**)malloc(sizeof(char*) * numcols);
+	int select, choice;
+	char id[20];
 
-for (int i = 0; i < numcols; i++)
-{
-	fscanf(neoray, "%s", timz);
-	insertime[i] = (char*)malloc(sizeof(char) * (strlen(timz)+1));
-	strcpy(insertime[i], timz);
+	do
+	{
+		printf("[1]Schedule an appointment to doctor\n[2]Schedule an appointment to nurse\n[3]Schedule an appointment to lab tests\n[4]Cancel an existing appointment\n[5]View a list of future appointments\n[6]Log out\n");
+		if (scanf("%d", &select) != 1) {
+			printf("\n");
+		}
+		fgetc(stdin);
 
-}
-fclose(neoray);
+		switch (select)
+		{
+		case 1:
+			doctor_appointment();
+			break;
 
-return insertime;
+
+		case 2:
+			nurse_appointment();
+			break;
+
+		case 3:
+			lab_appointment();
+			break;
+
+
+		case 4:
+			printf("\nPlease enter which appoinetment to cancel:\n[1]Doctor\n[2]Nurse\n[3]Lab\n");
+			scanf("%d", &choice);
+
+			printf("\nEnter id:\n");
+			fgets(id, 20, stdin);
+			id[strlen(id) - 1] = 0;
+
+			if(choice == 1)
+				CancelDoctor(&id);
+			if (choice == 2)
+				CancelNurse(&id);
+			if (choice == 3)
+				CancelLab(&id);
+			break;
+
+
+		case 5:
+			printf("\nEnter id:\n");
+			fgets(id, 20, stdin);
+			id[strlen(id) - 1] = 0;
+			printf("\n---------------------------\n");
+			ViewDoc(&id);
+			ViewNurse(&id);
+			ViewLab(&id);
+			printf("---------------------------\n");
+
+			break;
+		case 6:
+			break;
+		}
+	} while (select != 6);
 }
-void update()
+void doctor_appointment()
 {
+
+	char city[30], reason[200], doctortype[40], time[10], date[20], id[20];
+	char* typeAP = malloc(100);
+	int day, month, year, type, select;
+
+
+	FILE* p4 = fopen("MakeAppointment.csv", "r+");
+	if (p4 == NULL)
+		exit(1);
+
+	printf("Please enter ID:\n");
+	fgets(id, 20, stdin);
+	id[strlen(id) - 1] = 0;
+
+	printf("Please choose your preferred type of appointment:\n[1]Face to face appointment\n[2]Phone appointment\n");
+	if (scanf("%d", &type) != 1) {
+		printf("\n");
+	}
+	fgetc(stdin);
+
+	if (type == 1)
+	{
+		strcpy(typeAP, "Face to face");
+		printf("Please enter the name of the city where the clinic you want to go is located:\n");
+		fgets(city, 30, stdin);
+		city[strlen(city) - 1] = 0;
+	}
+	else
+	{
+		strcpy(typeAP, "Phone");
+		strcpy(city, "N/A");
+	}
+
+	printf("Please enter the type of doctor you would like to make an appointment with:\n");
+	fgets(doctortype, 40, stdin);
+	doctortype[strlen(doctortype) - 1] = 0;
+
+	printfAvailableAppoinetments();
+	printf("Please enter date from the list:\n");
+	printf("notice->Template for date is: STRING->[XX/XX/XXXX]\n");
+	fgets(date, 20, stdin);
+	date[strlen(date) - 1] = 0;
+
+	printf("Please enter time from the list:\n");
+	printf("notice->Template for time is: STRING->[XX:XX]\n");
+	fgets(time, 10, stdin);
+	time[strlen(time) - 1] = 0;
+
+	if (OccupiedApp(date, time))
+		printf("Date\Time not avaible!\n");
+	setCalendar(id, date, time);
+
+	printf("Do you want sumbit a reason for the appoinetment?\n[1]Yes\n[2]No\n");
+	if (scanf("%d", &type) != 1) {
+		printf("\n");
+	}
+	fgetc(stdin);
+
+	if (type == 1)
+	{
+		printf("Please the reason for the appoinetment\n->Notice: you can sumbit only 200 charcters\n");
+		fgets(reason, 200, stdin);
+		reason[strlen(reason) - 1] = 0;
+	}
+	else
+	{
+		strcpy(reason, "N/A");
+	}
+
+	fseek(p4, 0, SEEK_END);
+	fprintf(p4, "%s,%s,%s,%s,%s,%s,%s\n", id, typeAP, city, doctortype, date, time, reason);
+	printf(">The appoinetment is set!<\n\n");
+
+	fclose(p4);
+	free(typeAP);
+}
+void setCalendar(char id[], char date[], char time[])
+{
+	appoinetment data;
+	FILE* p4;
+
+	p4 = fopen("DoctorCalendar.csv", "r+");
+
+	fseek(p4, 14, SEEK_SET);
+	fprintf(p4, "%s,%s,%s\n", id, date, time);
+
+	fclose(p4);
+}
+void printfAvailableAppoinetments()
+{
+	appoinetment data;
 	FILE* p3;
-	int counter = 0;
 
-	p3 = fopen("AvailableAppoinetments.csv", "w");
+	char buffer[255] = { 0 };
+
+	p3 = fopen("AvailableAppoinetments.csv", "r");
 	if (p3 == NULL)
 	{
-		printf("\nAvailableAppoinetments.csv failed.\n");
+		printf("\n Failed to open file!");
+	}
+	else
+	{
+		printf("\n");
+		while ((fgets(buffer, 255, p3)) != NULL /*&& fgetc(p3) != EOF */)
+		{
+			puts(buffer);
+			/* Some processing */
+		}
+	}
+	fclose(p3);
+}
+
+//Doctor
+bool check_username(char username[20], int* counter)
+{
+	doctor data;
+	FILE* p2;
+	int found = 0, rawcounter = 0;
+
+	p2 = fopen("Doctor.csv", "r");
+
+	if (p2 == NULL)
+	{
+		printf("Error opening file\n");
 		exit(1);
 	}
 
+	fseek(p2, 65, SEEK_SET);
+
+	while (fgets(data.user_name, 20, p2))
+	{
+		char* temp;
+		temp = strtok(data.user_name, ",");
+
+		if (found == 1)
+			break;
+
+		while (temp != NULL)
+		{
+			rawcounter++;
+			if (strcmp(temp, username) == 0)
+			{
+				found = 1;
+				break;
+			}
+			temp = strtok(NULL, ",");
+		}
+	}
+	*counter = rawcounter;
+	fclose(p2);
+	if (found == 1)
+		return true;
+	else
+		return false;
+}
+bool check_password(char password[20], int counter)
+{
+	doctor data;
+	FILE* p3;
+	int found = 0, rawcounter = 0;
+
+	p3 = fopen("Doctor.csv", "r");
+	if (p3 == NULL)
+	{
+		printf("Error opening file\n");
+		exit(1);
+	}
+
+	fseek(p3, 65, SEEK_SET);
+
+	while (fgets(data.password, 20, p3))
+	{
+		char* temp;
+		temp = strtok(data.password, ",");
+
+		if (found == 1)
+			break;
+
+		while (temp != NULL)
+		{
+			if (rawcounter > (counter + 5)) //this method used for search by line data of the user. if the search method finish to read user data raw the program will break;
+			{
+				break;
+			}
+			else
+			{
+				rawcounter++;
+				if (strcmp(temp, password) == 0)
+				{
+					if (rawcounter < counter) //this method will ensure that the password check will be will search only in the correct raw.
+						return false;
+					else
+					{
+						found = 1;
+						break;
+					}
+				}
+				temp = strtok(NULL, ",");
+			}
+		}
+	}
+	fclose(p3);
+	if (found == 1)
+		return true;
+	else
+		return false;
+}
+void doctor_menu()
+{
+	int select;
+
+	do
+	{
+		printf("\n");
+		printf("[1]Edit doctor profile\n[2]Doctor calendar\n[3]Return to main menu\n");
+		if (scanf("%d", &select) != 1) {
+			printf("\n");
+		}
+		fgetc(stdin);
+
+		switch (select)
+		{
+		case 1:
+		{
+			int select;
+			printf("Choose section to update in your profile\n");
+			printf("[1]City\n[2]Birthdate\n[3]Email\n[4]Expertise\n[5]Phone number\n");
+			if (scanf("%d", &select) != 1) {
+				printf("\n");
+			}
+
+			editprofile(select);
+		}
+
+		case 2:
+		{
+			printfCalendar();
+			/*RebootAppoinetments();*/
+			break;
+		}
+
+		case 3:
+		{
+			return;
+			break;
+		}
+
+		}
+	} while (select != 3);
+}
+void printfCalendar()
+{
+	appoinetment data;
+	FILE* p3;
+
+	char buffer[255] = { 0 };
+
+	p3 = fopen("DoctorCalendar.csv", "r");
+	if (p3 == NULL)
+	{
+		printf("\n Failed to open file!");
+	}
+	else
+	{
+		printf("\n");
+
+		while ((fgets(buffer, 255, p3)) != NULL)
+		{
+			puts(buffer);
+			
+		}
+	}
+	fclose(p3);
+}
+void ViewDoc(char* id)
+{
+	appoinetment data;
+	FILE* p2;
+	int flag = 0, counter = 0, line = 0;
+
+	printf("\n");
+
+	p2 = fopen("DoctorCalendar.csv", "r");
+
+	if (p2 == NULL)
+	{
+		printf("Error opening file\n");
+		exit(1);
+	}
+
+	fseek(p2, 0, SEEK_SET);
+	char* temp;
+	while (fgets(data.id, 20, p2))
+	{
+
+		temp = strtok(data.id, ",");
+
+		if (flag == 1)
+			break;
+
+		while (temp != NULL)
+		{
+			if (strcmp(temp, id) == 0)
+			{
+				flag = 1;
+				break;
+			}
+			temp = strtok(NULL, ",");
+			counter++;
+		}
+	}
+	fclose(p2);
+
+
+	if (flag == 1)
+	{
+		appoinetment data;
+		FILE* p3;
+		int foundit = 0;
+		int newline = 0;
+		int newCounter = 0;
+
+		char buffer[255] = { 0 };
+
+		p3 = fopen("DoctorCalendar.csv", "r");
+		if (p3 == NULL)
+		{
+			printf("Error opening file\n");
+			exit(1);
+		}
+
+		printf("Doctor Appoinetments are:\n");
+		while (fgets(buffer, sizeof(buffer), p3))
+		{
+			if (foundit == 2)
+				break;
+
+			char* temp;
+			temp = strtok(buffer, ",");
+
+			while (temp != NULL)
+			{
+				if (foundit == 2)
+					break;
+
+				if (newCounter == (counter + 1))
+				{
+					puts(temp);
+					foundit++;
+				}
+				if (newCounter == (counter + 2))
+				{
+					puts(temp);
+					foundit++;
+				}
+				newCounter++;
+				temp = strtok(NULL, ",");
+			}
+		}
+		fclose(p3);
+	}
+}
+void editprofile(int select)
+{
+	printf("[1]City\n[2]Birthdate\n[3]Email\n[4]Expertise\n[5]Phone number\n");
+
+	switch (select)
+	{
+	case 1:
+	{
+		doctor data;
+		FILE* p3;
+		int found = 0;
+		char email[50];
+
+		fgets(email, 50, stdin);
+		email[strlen(email) - 1] = 0;
+
+		p3 = fopen("Doctor.csv", "r");
+		if (p3 == NULL)
+		{
+			printf("Error opening file\n");
+			exit(1);
+		}
+
+		while (fgets(data.email, 50, p3))
+		{
+			char* temp;
+			temp = strtok(data.email, ",");
+
+			while (temp != NULL)
+			{
+				if (strcmp(temp, email) == 0)
+				{
+					found = 1;
+					break;
+				}
+				temp = strtok(NULL, ",");
+			}
+		}
+		fclose(p3);
+	}
+
+	break;
+	}
+}
+void CancelDoctor(char* id)
+{
+	appoinetment data;
+	FILE* p2;
+	int flag = 0, counter = 0, line = 0;
+
+	printf("\n");
+
+	p2 = fopen("DoctorCalendar.csv", "r");
+
+	if (p2 == NULL)
+	{
+		printf("Error opening file\n");
+		exit(1);
+	}
+
+	fseek(p2, 0, SEEK_SET);
+	char* temp;
+	while (fgets(data.id, 20, p2))
+	{
+
+		temp = strtok(data.id, ",");
+
+		if (flag == 1)
+			break;
+
+		while (temp != NULL)
+		{
+			if (strcmp(temp, id) == 0)
+			{
+				flag = 1;
+				break;
+			}
+			temp = strtok(NULL, ",");
+			counter++;
+		}
+	}
+	fclose(p2);
+
+
+	if (flag == 1)
+	{
+		appoinetment data;
+		FILE* p3;
+		int foundit = 0;
+		int newline = 0;
+		int newCounter = 0;
+		char* remove;
+		remove = " ";
+
+		char buffer[255] = { 0 };
+
+		p3 = fopen("DoctorCalendar.csv", "w");
+		if (p3 == NULL)
+		{
+			printf("Error opening file\n");
+			exit(1);
+		}
+
+		fseek(p3, 13, SEEK_SET);
+		while (fgets(buffer, sizeof(buffer), p3))
+		{
+			if (foundit == 3)
+				break;
+
+			char* temp;
+			temp = strtok(buffer, ",");
+
+			while (temp != NULL)
+			{
+				if (foundit == 2)
+					break;
+
+				if (newCounter == (counter))
+				{
+					fprintf(p3, "%s,", remove);
+					foundit++;
+				}
+				if (newCounter == (counter + 1))
+				{
+					fprintf(p3, "%s,", remove);
+					foundit++;
+				}
+				if (newCounter == (counter + 2))
+				{
+					fprintf(p3, "%s,", remove);
+					foundit++;
+				}
+				newCounter++;
+				temp = strtok(NULL, ",");
+			}
+		}
+		fclose(p3);
+	}
+}
+
+//Nurse
+void nurse_appointment()
+{
+	char city[30], apptype[40], time[10], date[20], id[20];
+	char* typeAP = malloc(100);
+	int type;
+
+	FILE* p6 = fopen("NurseAppointment.csv", "r+");
+	if (p6 == NULL)
+		exit(1);
+
+	printf("Please enter ID:\n");
+	fgets(id, 20, stdin);
+	id[strlen(id) - 1] = 0;
+
+	printf("Please enter the name of the city where the clinic you want to go is located:\n");
+	fgets(city, 30, stdin);
+	city[strlen(city) - 1] = 0;
+
+	printf("Please choose your preferred type of appointment:\n[1]Vaccine\n[2]Bandage change\n");
+	scanf("%d", &type);
+	if (type < 1 || type>2)
+		printf("Error type\n");
+	fgetc(stdin);
+
+	if (type == 1)
+	{
+		strcpy(typeAP, "Vaccine");
+	}
+	if (type == 2)
+	{
+		strcpy(typeAP, "Bandage change");
+	}
+
+	printfAvailableAppoinetmentsNurse();
+	printf("Please enter date from the list:\n");
+	printf("notice->Template for date is: STRING->[XX/XX/XXXX]\n");
+	fgets(date, 20, stdin);
+	date[strlen(date) - 1] = 0;
+
+	printf("Please enter time from the list:\n");
+	printf("notice->Template for time is: STRING->[XX:XX]\n");
+	fgets(time, 10, stdin);
+	time[strlen(time) - 1] = 0;
+
+	setCalendarNurse(id, date, time);
+
+	fseek(p6, 0, SEEK_END);
+	fprintf(p6, "%s,%s,%s,%s,%s\n", id, city, typeAP, date, time);
+	printf(">The appoinetment to nurse is set!<\n\n");
+
+	fclose(p6);
+	free(typeAP);
+}
+void RebootAppoinetmentsNurse()
+{
+	FILE* p3;
+	const char* date0, * date1, * date2, * date3, * date4;
+	int counter = 1, max = 0;
+	char* dates[5] = { "05/12/21" ,"06/12/21" ,"07/12/21" ,"08/12/21" ,"09/12/21" };
+
+	p3 = fopen("NurseAppointment.csv", "w");
+	if (p3 == NULL)
+	{
+		printf("\nNurseAppointment.csv failed.\n");
+		exit(1);
+	}
+
+	globaldata = (appoinetment*)malloc(5 * sizeof(appoinetment));
+
+	char** temp = Loadtime();
+	SortimeArray(temp);
+
 	for (int i = 0; i < ROWS; i++)
 	{
+		if (max == 1)
+			fprintf(p3, "\n", globaldata[i].time[counter]);
+
 		counter = 0;
+		strcpy(globaldata[i].date, dates[i]);
 		fprintf(p3, "%s,", globaldata[i].date);
 
 		while (counter < 17)
@@ -1239,6 +1404,7 @@ void update()
 			if (counter == 16)
 			{
 				fprintf(p3, "%s", globaldata[i].time[counter]);
+				max = 1;
 			}
 			else
 				fprintf(p3, "%s,", globaldata[i].time[counter]);
@@ -1247,15 +1413,546 @@ void update()
 	}
 	fclose(p3);
 }
-void updatetime(char **timez)
+void printfAvailableAppoinetmentsNurse()
 {
-	for (int i = 0; i < 5; i++)
+	appoinetment data;
+	FILE* p3;
+
+	char buffer[255] = { 0 };
+
+	p3 = fopen("NurseAppointment.csv", "r");
+	if (p3 == NULL)
 	{
-		globaldata[i].time = (char**)malloc(sizeof(char*) * 18);
-		for (int j = 0; j < 18; j++)
+		printf("\n Failed to open file!");
+	}
+	else
+	{
+		printf("\n");
+		while ((fgets(buffer, 255, p3)) != NULL /*&& fgetc(p3) != EOF */)
 		{
-			globaldata[i].time[j] = (char*)malloc(sizeof(char) * (strlen(timez[j])+1));
-			strcpy(globaldata[i].time[j], timez[j]);
+			puts(buffer);
+			/* Some processing */
 		}
+	}
+	fclose(p3);
+}
+void setCalendarNurse(char id[], char date[], char time[])
+{
+	appoinetment data;
+	FILE* p4;
+
+	p4 = fopen("CalendarNurse.csv", "r+");
+
+	fseek(p4, 14, SEEK_SET);
+	fprintf(p4, "%s,%s,%s\n", id, date, time);
+
+	fclose(p4);
+}
+void ViewNurse(char* id)
+{
+	appoinetment data;
+	FILE* p2;
+	int flag = 0, counter = 0, line = 0;
+
+	printf("\n");
+
+	p2 = fopen("CalendarNurse.csv", "r");
+
+	if (p2 == NULL)
+	{
+		printf("Error opening file\n");
+		exit(1);
+	}
+
+	fseek(p2, 0, SEEK_SET);
+	char* temp;
+	while (fgets(data.id, 20, p2))
+	{
+
+		temp = strtok(data.id, ",");
+
+		if (flag == 1)
+			break;
+
+		while (temp != NULL)
+		{
+		/*	if (counter == 3)
+			{
+				counter = 0;
+				line++;
+			}*/
+			if (strcmp(temp, id) == 0)
+			{
+				flag = 1;
+				break;
+			}
+			temp = strtok(NULL, ",");
+			counter++;
+		}
+	}
+	fclose(p2);
+
+
+	if (flag == 1)
+	{
+		appoinetment data;
+		FILE* p3;
+		int foundit = 0;
+		int newline = 0;
+		int newCounter = 0;
+
+		char buffer[255] = { 0 };
+
+		p3 = fopen("CalendarNurse.csv", "r");
+		if (p3 == NULL)
+		{
+			printf("Error opening file\n");
+			exit(1);
+		}
+
+		printf("Nurse Appoinetments are:\n");
+		while (fgets(buffer, sizeof(buffer), p3))
+		{
+			if (foundit == 2)
+				break;
+
+			char* temp;
+			temp = strtok(buffer, ",");
+
+			while (temp != NULL)
+			{
+				if (foundit == 2)
+					break;
+
+				if (newCounter == (counter + 1))
+				{
+					puts(temp);
+					foundit++;
+				}
+				if (newCounter == (counter + 2))
+				{
+					puts(temp);
+					foundit++;
+				}
+				newCounter++;
+				temp = strtok(NULL, ",");
+			}
+		}
+		fclose(p3);
+	}
+}
+void CancelNurse(char* id)
+{
+	appoinetment data;
+	FILE* p2;
+	int flag = 0, counter = 0, line = 0;
+
+	printf("\n");
+
+	p2 = fopen("CalendarNurse.csv", "r");
+
+	if (p2 == NULL)
+	{
+		printf("Error opening file\n");
+		exit(1);
+	}
+
+	fseek(p2, 0, SEEK_SET);
+	char* temp;
+	while (fgets(data.id, 20, p2))
+	{
+
+		temp = strtok(data.id, ",");
+
+		if (flag == 1)
+			break;
+
+		while (temp != NULL)
+		{
+			if (strcmp(temp, id) == 0)
+			{
+				flag = 1;
+				break;
+			}
+			temp = strtok(NULL, ",");
+			counter++;
+		}
+	}
+	fclose(p2);
+
+
+	if (flag == 1)
+	{
+		appoinetment data;
+		FILE* p3;
+		int foundit = 0;
+		int newline = 0;
+		int newCounter = 0;
+		char* remove;
+		remove = " ";
+
+		char buffer[255] = { 0 };
+
+		p3 = fopen("CalendarNurse.csv", "w");
+		if (p3 == NULL)
+		{
+			printf("Error opening file\n");
+			exit(1);
+		}
+
+		fseek(p3, 13, SEEK_SET);
+		while (fgets(buffer, sizeof(buffer), p3))
+		{
+			if (foundit == 3)
+				break;
+
+			char* temp;
+			temp = strtok(buffer, ",");
+
+			while (temp != NULL)
+			{
+				if (foundit == 2)
+					break;
+
+				if (newCounter == (counter))
+				{
+					fprintf(p3, "%s,", remove);
+					foundit++;
+				}
+				if (newCounter == (counter + 1))
+				{
+					fprintf(p3, "%s,", remove);
+					foundit++;
+				}
+				if (newCounter == (counter + 2))
+				{
+					fprintf(p3, "%s,", remove);
+					foundit++;
+				}
+				newCounter++;
+				temp = strtok(NULL, ",");
+			}
+		}
+		fclose(p3);
+	}
+}
+
+//Lab
+void lab_appointment()
+{
+	char city[30], apptype[40], time[10], date[20], id[20];
+	char* typeAP = malloc(100);
+	int type;
+
+	FILE* p6 = fopen("LabAppointment.csv", "r+");
+	if (p6 == NULL)
+		exit(1);
+
+	printf("Please enter ID:\n");
+	fgets(id, 20, stdin);
+	id[strlen(id) - 1] = 0;
+
+	printf("Please enter the name of the city where the clinic you want to go is located:\n");
+	fgets(city, 30, stdin);
+	city[strlen(city) - 1] = 0;
+
+	printf("Please choose your preferred type of appointment:\n[1]Antibodies test\n[2]Urine test\n[3]Blood test\n");
+	scanf("%d", &type);
+	if (type < 1 || type>3)
+		printf("Error type\n");
+	fgetc(stdin);
+
+	if (type == 1)
+	{
+		strcpy(typeAP, "Antibodies test");
+	}
+	if (type == 2)
+	{
+		strcpy(typeAP, "Urine test");
+	}
+	if (type == 3)
+	{
+		strcpy(typeAP, "Blood test");
+	}
+
+	printfAvailableAppoinetmentsLab();
+	printf("Please enter date from the list:\n");
+	printf("notice->Template for date is: STRING->[XX/XX/XXXX]\n");
+	fgets(date, 20, stdin);
+	date[strlen(date) - 1] = 0;
+
+	printf("Please enter time from the list:\n");
+	printf("notice->Template for time is: STRING->[XX:XX]\n");
+	fgets(time, 10, stdin);
+	time[strlen(time) - 1] = 0;
+
+	setCalendarLab(id, date, time);
+
+
+	fseek(p6, 0, SEEK_END);
+	fprintf(p6, "%s,%s,%s,%s,%s\n", id, city, typeAP, date, time);
+	printf(">The appoinetment to nurse is set!<\n\n");
+
+	fclose(p6);
+	free(typeAP);
+}
+void RebootAppoinetmentsLab()
+{
+	FILE* p3;
+	const char* date0, * date1, * date2, * date3, * date4;
+	int counter = 1, max = 0;
+	char* dates[5] = { "05/12/21" ,"06/12/21" ,"07/12/21" ,"08/12/21" ,"09/12/21" };
+
+	p3 = fopen("LabAppointment.csv", "w");
+	if (p3 == NULL)
+	{
+		printf("\nLabAppointment.csv failed.\n");
+		exit(1);
+	}
+
+	globaldata = (appoinetment*)malloc(5 * sizeof(appoinetment));
+
+	char** temp = Loadtime();
+	SortimeArray(temp);
+
+	for (int i = 0; i < ROWS; i++)
+	{
+		if (max == 1)
+			fprintf(p3, "\n", globaldata[i].time[counter]);
+
+		counter = 0;
+		strcpy(globaldata[i].date, dates[i]);
+		fprintf(p3, "%s,", globaldata[i].date);
+
+		while (counter < 17)
+		{
+			if (counter == 16)
+			{
+				fprintf(p3, "%s", globaldata[i].time[counter]);
+				max = 1;
+			}
+			else
+				fprintf(p3, "%s,", globaldata[i].time[counter]);
+			counter++;
+		}
+	}
+	fclose(p3);
+}
+void printfAvailableAppoinetmentsLab()
+{
+	appoinetment data;
+	FILE* p3;
+
+	char buffer[255] = { 0 };
+
+	p3 = fopen("LabAppointment.csv", "r");
+	if (p3 == NULL)
+	{
+		printf("\n Failed to open file!");
+	}
+	else
+	{
+		printf("\n");
+		while ((fgets(buffer, 255, p3)) != NULL /*&& fgetc(p3) != EOF */)
+		{
+			puts(buffer);
+			/* Some processing */
+		}
+	}
+	fclose(p3);
+}
+void setCalendarLab(char id[], char date[], char time[])
+{
+	appoinetment data;
+	FILE* p4;
+
+	p4 = fopen("CalendarLab.csv", "r+");
+
+	fseek(p4, 14, SEEK_SET);
+	fprintf(p4, "%s,%s,%s\n", id, date, time);
+
+	fclose(p4);
+}
+void ViewLab(char* id)
+{
+	appoinetment data;
+	FILE* p2;
+	int flag = 0, counter = 0, line = 0;
+
+	printf("\n");
+
+	p2 = fopen("CalendarLab.csv", "r");
+
+	if (p2 == NULL)
+	{
+		printf("Error opening file\n");
+		exit(1);
+	}
+
+	fseek(p2, 0, SEEK_SET);
+	char* temp;
+	while (fgets(data.id, 20, p2))
+	{
+
+		temp = strtok(data.id, ",");
+
+		if (flag == 1)
+			break;
+
+		while (temp != NULL)
+		{
+			if (strcmp(temp, id) == 0)
+			{
+				flag = 1;
+				break;
+			}
+			temp = strtok(NULL, ",");
+			counter++;
+		}
+	}
+	fclose(p2);
+
+
+	if (flag == 1)
+	{
+		appoinetment data;
+		FILE* p3;
+		int foundit = 0;
+		int newline = 0;
+		int newCounter = 0;
+
+		char buffer[255] = { 0 };
+
+		p3 = fopen("CalendarLab.csv", "r");
+		if (p3 == NULL)
+		{
+			printf("Error opening file\n");
+			exit(1);
+		}
+
+		printf("Lab Appoinetments are:\n");
+		while (fgets(buffer, sizeof(buffer), p3))
+		{
+			if (foundit == 2)
+				break;
+
+			char* temp;
+			temp = strtok(buffer, ",");
+
+			while (temp != NULL)
+			{
+				if (foundit == 2)
+					break;
+
+				if (newCounter == (counter + 1))
+				{
+					puts(temp);
+					foundit++;
+				}
+				if (newCounter == (counter + 2))
+				{
+					puts(temp);
+					foundit++;
+				}
+				newCounter++;
+				temp = strtok(NULL, ",");
+			}
+		}
+		fclose(p3);
+	}
+}
+void CancelLab(char* id)
+{
+	appoinetment data;
+	FILE* p2;
+	int flag = 0, counter = 0, line = 0;
+
+	printf("\n");
+
+	p2 = fopen("CalendarLab.csv", "r");
+
+	if (p2 == NULL)
+	{
+		printf("Error opening file\n");
+		exit(1);
+	}
+
+	fseek(p2, 0, SEEK_SET);
+	char* temp;
+	while (fgets(data.id, 20, p2))
+	{
+
+		temp = strtok(data.id, ",");
+
+		if (flag == 1)
+			break;
+
+		while (temp != NULL)
+		{
+			if (strcmp(temp, id) == 0)
+			{
+				flag = 1;
+				break;
+			}
+			temp = strtok(NULL, ",");
+			counter++;
+		}
+	}
+	fclose(p2);
+
+
+	if (flag == 1)
+	{
+		appoinetment data;
+		FILE* p3;
+		int foundit = 0;
+		int newline = 0;
+		int newCounter = 0;
+		char* remove;
+		remove = " ";
+
+		char buffer[255] = { 0 };
+
+		p3 = fopen("CalendarLab.csv", "w");
+		if (p3 == NULL)
+		{
+			printf("Error opening file\n");
+			exit(1);
+		}
+
+		fseek(p3, 13, SEEK_SET);
+		while (fgets(buffer, sizeof(buffer), p3))
+		{
+			if (foundit == 3)
+				break;
+
+			char* temp;
+			temp = strtok(buffer, ",");
+
+			while (temp != NULL)
+			{
+				if (foundit == 2)
+					break;
+
+				if (newCounter == (counter))
+				{
+					fprintf(p3, "%s,", remove);
+					foundit++;
+				}
+				if (newCounter == (counter + 1))
+				{
+					fprintf(p3, "%s,", remove);
+					foundit++;
+				}
+				if (newCounter == (counter + 2))
+				{
+					fprintf(p3, "%s,", remove);
+					foundit++;
+				}
+				newCounter++;
+				temp = strtok(NULL, ",");
+			}
+		}
+		fclose(p3);
 	}
 }
