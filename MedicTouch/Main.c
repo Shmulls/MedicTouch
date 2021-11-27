@@ -137,33 +137,27 @@ void create_user()
 		do
 		{
 			printf("Enter password:\n");
-			printf("notice->Password number contains 20 letters!");
+			printf("notice->Password number contains 20 letters!\n");
 			fgets(data.password, 20, stdin);
 			data.password[strlen(data.password) - 1] = 0;
 		} while (strlen(data.password) > 21);
 
-		printf("Enter birthdate (in this template-->[day/month/year]):\n");
+		printf("Enter birthdate (in this template-->[XX/XX/XXXX]):\n");
 		fgets(data.date, 50, stdin);
 		data.date[strlen(data.date) - 1] = 0;
-
-		/*printf("Enter birthdate [day/month/year]:\n");
-		if (scanf("%d%d%d", &data.day, &data.month, &data.year) != 1) {
-			printf("\n");
-		}
-		fgetc(stdin);*/
 
 		do
 		{
 			printf("Enter Expertise:\n");
+			printf("notice->Expertise number contains 20 letters!\n");
 			fgets(data.expertise, 20, stdin);
-			printf("notice->Email number contains 20 letters!");
 			data.expertise[strlen(data.expertise) - 1] = 0;
 		} while (strlen(data.password) > 21);
 
 		do
 		{
 			printf("Enter email address:\n");
-			printf("notice->Email number contains 50 letters!");
+			printf("notice->Email contains 50 letters!\n");
 			fgets(data.email, 50, stdin);
 			data.email[strlen(data.email) - 1] = 0;
 		} while (strlen(data.email) > 51);
@@ -171,21 +165,19 @@ void create_user()
 		do
 		{
 			printf("Enter phone number:\n");
-			printf("notice->Phone number contains 10 digits!");
+			printf("notice->Phone number contains 10 digits!\n");
 			if (scanf(" %ld", &data.phone_number) != 1) {
 				printf("\n");
 			}
 			fgetc(stdin);
 		} while (!(data.phone_number > 9999999999 || data.phone_number < 1000000000));
 
-		do
-		{
 			printf("Enter gender:\n[M] Man / [W] Woman / [O] Other:\n");
 			if (scanf(" %c", &data.gender) != 1) {
 				printf("\n");
 			}
 			fgetc(stdin);
-		} while (!(data.gender == 'M' || data.gender == 'N' || data.gender == 'O'));
+		
 
 		fseek(p2, 0, SEEK_END);
 		/*fprintf(p2, "%s,%s,\%d\/\%d\/\%d\,%s,%s,%ld,%c\n", data.user_name, data.password, data.day, data.month, data.year, data.expertise, data.email, data.phone_number, data.gender);*/
@@ -217,7 +209,7 @@ void create_user()
 		do
 		{
 			printf("Enter password:\n");
-			printf("notice->Password number contains 20 letters!");
+			printf("notice->Password number contains 20 letters!\n");
 			fgets(data.password, 20, stdin);
 			data.password[strlen(data.password) - 1] = 0;
 		} while (strlen(data.password) > 21);
@@ -228,13 +220,14 @@ void create_user()
 		}
 		fgetc(stdin);*/
 
-		printf("Enter birthdate (in this template-->[day/month/year]):\n");
+		printf("Enter birthdate (in this template-->[XX/XX/XXXX]):\n");
 		fgets(data.date, 50, stdin);
 		data.date[strlen(data.date) - 1] = 0;
 
 		do
 		{
 			printf("Enter email address:\n");
+			printf("notice->Email contains 50 letters!\n");
 			fgets(data.email, 50, stdin);
 			data.email[strlen(data.email) - 1] = 0;
 		} while (strlen(data.email) > 51);
@@ -242,6 +235,7 @@ void create_user()
 		do
 		{
 			printf("Enter phone number:\n");
+			printf("notice->phone number contains 10 digits!\n");
 			if (scanf("%ld", &data.phone_number) != 1) {
 				printf("\n");
 			}
@@ -249,14 +243,12 @@ void create_user()
 		} while (!(data.phone_number > 9999999999 || data.phone_number < 1000000000));
 
 
-		do
-		{
+		
 			printf("Enter gender:\n[M] Man / [W] Woman / [O] Other:\n");
 			if (scanf(" %c", &data.gender) != 1) {
 				printf("\n");
 			}
-		} while (!(data.gender == 'M' || data.gender == 'N' || data.gender == 'O'));
-
+	
 		fseek(p1, 0, SEEK_END);
 		/*fprintf(p1, "%s,%s,\%d\/\%d\/\%d\,%s,%ld,%c\n", data.user_name, data.password, data.day, data.month, data.year, data.email, data.phone_number, data.gender);*/
 		fprintf(p1, "%s,%s,%s,%s,%ld,%c\n", data.user_name, data.password, data.date, data.email, data.phone_number, data.gender);
@@ -854,7 +846,7 @@ void doctor_appointment()
 
 	printfAvailableAppoinetments();
 	printf("Please enter date from the list:\n");
-	printf("notice->Template for date is: STRING->[XX/XX/XXXX]\n");
+	printf("notice->Template for date is: STRING->[XX/XX/XX]\n");
 	fgets(date, 20, stdin);
 	date[strlen(date) - 1] = 0;
 
@@ -898,7 +890,7 @@ void setCalendar(char id[], char date[], char time[])
 
 	p4 = fopen("DoctorCalendar.csv", "r+");
 
-	fseek(p4, 14, SEEK_SET);
+	fseek(p4, 0, SEEK_END);
 	fprintf(p4, "%s,%s,%s\n", id, date, time);
 
 	fclose(p4);
@@ -1193,7 +1185,7 @@ void editprofile(int select)
 		fgets(email, 50, stdin);
 		email[strlen(email) - 1] = 0;
 
-		p3 = fopen("Doctor.csv", "r");
+		p3 = fopen("Doctor.csv", "r+");
 		if (p3 == NULL)
 		{
 			printf("Error opening file\n");
@@ -1443,7 +1435,7 @@ void setCalendarNurse(char id[], char date[], char time[])
 
 	p4 = fopen("CalendarNurse.csv", "r+");
 
-	fseek(p4, 14, SEEK_SET);
+	fseek(p4, 0, SEEK_END);
 	fprintf(p4, "%s,%s,%s\n", id, date, time);
 
 	fclose(p4);
@@ -1768,7 +1760,7 @@ void setCalendarLab(char id[], char date[], char time[])
 
 	p4 = fopen("CalendarLab.csv", "r+");
 
-	fseek(p4, 14, SEEK_SET);
+	fseek(p4, 0, SEEK_END);
 	fprintf(p4, "%s,%s,%s\n", id, date, time);
 
 	fclose(p4);
