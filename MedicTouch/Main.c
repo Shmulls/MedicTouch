@@ -16,7 +16,6 @@ typedef struct doctor
 typedef struct patient
 {
 	char user_name[20], password[20], email[50], date[50];
-	int day, month, year;
 	long phone_number;
 	char gender;
 
@@ -34,6 +33,7 @@ appoinetment *globaldata = NULL;
 void create_user();
 void login();
 void RebootAppoinetmentsDoc();
+void PasswordRecovery(char username[]);
 
 //Patient
 bool check_usernamep(char username[20], int* counter);
@@ -65,13 +65,14 @@ void RebootAppoinetmentsNurse();
 void printfAvailableAppoinetmentsNurse();
 void setCalendarNurse(char id[], char date[], char time[]);
 void ViewNurse(char* id);
-void CancelNurse(char* id);
+void CancelNurse(char id[]);
 
 //Lab
 void lab_appointment();
 void RebootAppoinetmentsLab();
 void printfAvailableAppoinetmentsLab();
 void setCalendarLab(char id[], char date[], char time[]);
+void CancelLab(char* id);
 void ViewLab(char* id);
 
 //Main
@@ -80,10 +81,11 @@ int main()
 	int menu;
 	/*RebootAppoinetmentsDoc();*/
 	UpdateAppoinetments();
+	char newuser[20];
 
 	do
 	{
-		printf("\nChoose operation:\n[1]Create user\n[2]Login\n[3]Password recovery\n[0]Exit\n");
+		printf("\nChoose operation:\n[1]Create user\n[2]Login\n[0]Exit\n");
 		if (scanf("%d", &menu) != 1) {
 			printf("\n");
 		}
@@ -98,7 +100,6 @@ int main()
 			login();
 			break;
 		}
-
 	} while (menu != 0);
 
 	return 0;
@@ -362,7 +363,53 @@ void RebootAppoinetmentsDoc()
 	}
 	fclose(p3);
 }
-void CancelLab(char* id);
+void PasswordRecovery(char username[])
+{
+	FILE* p1, *p2;
+	int found = 0;
+	int Counter = 0;
+	char tempword[20], newuser[20];
+
+	char buffer[255] = { 0 };
+
+	p1 = fopen("Patient.csv", "r");
+	if (p1 == NULL)
+	{
+		printf("Error opening file\n");
+		exit(1);
+	}
+	p2 = fopen("Temp.csv", "w");
+	if (p2 == NULL)
+	{
+		printf("Error opening file\n");
+		exit(1);
+	}
+
+	while (fgets(buffer, sizeof(buffer), p1))
+	{
+		char* temp;
+		temp = strtok(buffer, ",");
+
+		while (temp != NULL)
+		{
+
+			if (strcmp(temp, username) == 0)
+			{
+					printf("Enter username:\n");
+					fgets(newuser, 20, stdin);
+					newuser[strlen(newuser) - 1] = 0;
+					fprintf(p2, "%s,", newuser);
+					temp = strtok(NULL, ",");
+			}
+			fprintf(p2, "%s,", temp);
+			Counter++;
+			temp = strtok(NULL, ",");
+		}
+	}
+	fclose(p1);
+	fclose(p2);
+	
+}
 
 //Patient
 bool check_usernamep(char username[20], int* counter)
@@ -775,6 +822,7 @@ void patient_menu()
 		case 4:
 			printf("\nPlease enter which appoinetment to cancel:\n[1]Doctor\n[2]Nurse\n[3]Lab\n");
 			scanf("%d", &choice);
+			fgetc(stdin);
 
 			printf("\nEnter id:\n");
 			fgets(id, 20, stdin);
@@ -1533,7 +1581,7 @@ void ViewNurse(char* id)
 		fclose(p3);
 	}
 }
-void CancelNurse(char* id)
+void CancelNurse(char id[])
 {
 	appoinetment data;
 	FILE* p2;
@@ -1627,6 +1675,7 @@ void CancelNurse(char* id)
 		}
 		fclose(p3);
 	}
+
 }
 
 //Lab
