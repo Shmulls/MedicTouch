@@ -720,22 +720,20 @@ void doctor_appointment()
 	fgets(doctortype, 40, stdin);
 	doctortype[strlen(doctortype) - 1] = 0;
 
-	/*do
-	{*/
-	
 	printfAvailableAppoinetments();
 	printf("Please enter date from the list:\n");
+	printf("notice->Template for date is: [XX/XX/XXXX]\n");
 	fgets(date, 20, stdin);
 	date[strlen(date) - 1] = 0;
 
 	printf("Please enter time from the list:\n");
+	printf("notice->Template for time is: [XX:XX]\n");
 	fgets(time, 10, stdin);
 	time[strlen(time) - 1] = 0;
-	OccupiedApp(date, time);
 
-	if (OccupiedApp(date, time) == true)
-		printf("Time delete\n");
-	/*} while (IsOccupied(&time, &date) == false);*/
+	if (!OccupiedApp(date, time))
+		printf("Date\Time not avaible!\n");
+	setCalendar(id, date, time);
 
 	printf("Do you want sumbit a reason for the appoinetment?\n[1]Yes\n[2]No\n");
 	if (scanf("%d", &type) != 1) {
@@ -827,23 +825,23 @@ void printfAvailableAppoinetments()
 	}
 	fclose(p3);
 }
-//void setCalendar(char *id, char *date, char *time)
-//{
-//	appoinetment data;
-//	FILE *p4;
-//	
-//
-//	p4 = fopen("DoctorCalendar.csv", "r+"); 
-//
-//	strcpy(data.id, id);
-//	strcpy(data.date, date);
-//	strcpy(data.time, time);
-//
-//	fseek(p4, 0, SEEK_END);
-//	fprintf(p4, "%s,%s,%s\n", data.id, data.date, data.time);
-//
-//	fclose(p4);
-//}
+void setCalendar(char *id, char *date, char *time)
+{
+	appoinetment data;
+	FILE *p4;
+	
+
+	p4 = fopen("DoctorCalendar.csv", "r+"); 
+
+	strcpy(data.id, id);
+	strcpy(data.date, date);
+	strcpy(data.time, time);
+
+	fseek(p4, 0, SEEK_END);
+	fprintf(p4, "%s,%s,%s\n", data.id, data.date, data.time);
+
+	fclose(p4);
+}
 //void nurse_appointment()
 //{
 //	char city[30], apptype[40], time[10], date[20], id[20];
