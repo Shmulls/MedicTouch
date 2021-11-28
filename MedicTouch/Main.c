@@ -33,7 +33,7 @@ appoinetment *globaldata = NULL;
 void create_user();
 void login();
 void RebootAppoinetmentsDoc();
-void PasswordRecovery(char username[]);
+//void PasswordRecovery(char username[]);
 
 //Patient
 bool check_usernamep(char username[20], int* counter);
